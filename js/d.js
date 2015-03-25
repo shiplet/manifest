@@ -2,35 +2,32 @@ var app = angular.module('manifest');
 
 app.service('googleService', function(envService, $timeout, $location, $http, $q, $window, $localStorage, $sessionStorage){
     var accessCode, authToken, authUrl, x;
-    envService.getEnv().then(function(response){
-	x = response.data;
-	authUrl = x.a+'scope='+x.f+'&redirect_uri='+x.e+'&response_type='+x.c+'&client_id='+x.d;
+    envService.getEnv().then(function(r){	
+	authUrl = r.a+'scope='+r.f+'&redirect_uri='+r.e+'&response_type='+r.c+'&client_id='+r.d;
     });
 
     var tokens = $sessionStorage.$default();
 
     var getToken = function(token) {
-	envService.getEnv().then(function(response){
-	    x = response.data; 
-	});
-	if (token === $location.absUrl()) {
-	    console.log('Not authenticated yet');
-	} else {
-	    console.log(x);
-	    // var deferred = $q.defer();
-	    // $http({
-	    // 	method: 'POST',
-	    // 	url: x.b+'code='+token+'&client_id='+x.d+'&client_secret='+x.g+'&redirect_uri='+x.e+'&grant_type=authorization_code'
-	    // }).then(function(success){
-	    // 	tokens.authToken = success.data.access_token;
-	    // 	$location.path('/manage-projects');
-	    // }, function(error){
-	    // 	if (error.status === 400) {
-	    // 	    console.error('This session has not authenticated yet.');
-	    // 	}
-	    // });
-	    // return deferred.promise;
-	}
+	envService.getEnv().then(function(r){
+	    if (token === $location.absUrl()) {
+		console.log('Not authenticated yet');
+	    } else {
+		var deferred = $q.defer();
+		$http({
+			method: 'POST',
+			url: r.b+'code='+token+'&client_id='+r.d+'&client_secret='+r.g+'&redirect_uri='+r.e+'&grant_type=authorization_code'
+		}).then(function(success){
+			tokens.authToken = success.data.access_token;
+			$location.path('/manage-projects');
+		}, function(error){
+			if (error.status === 400) {
+			    console.error('This session has not authenticated yet.');
+			}
+		});
+		return deferred.promise;
+	    }
+	});	
     };
     
     return {

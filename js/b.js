@@ -7,7 +7,7 @@ app.service('envService', function($window, $http, $firebaseArray, $firebaseObje
 		method: 'GET',
 		url: 'js/getEnv'
 	    }).then(function(success){
-		return success;
+		return success.data;
 	    }, function(error){
 		return error;
 	    });

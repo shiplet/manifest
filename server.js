@@ -10,19 +10,18 @@ app.use(express.static(__dirname));
 app.get('/js/getEnv', function(req, res){
     console.log('File requested at /js/getEnv');
     fb.on('value', function(snapshot){
-	console.log(snapshot.val());
 	res.json(snapshot.val());
     }, function(error){
 	console.log(error);
     });
 });
 
-
 app.use('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
+    console.log(req.params);
 });
 
 app.listen(process.env.PORT || 3000, function(){
-    console.log('Listening on port %d',  this.address().port, app.settings.en);
+    console.log('Listening on port %d',  this.address().port, app.settings.env);
 });
 

@@ -10,7 +10,7 @@ app.controller('MainController', function($rootScope, $scope, envService, google
     };
 
     (function() {
-	if (!$sessionStorage.authToken) {	    
+	if (!$sessionStorage.authToken) {
 	    googleService.authenticate.mobile.token();
 	} else if ($sessionStorage.authToken) {
 	    $location.path('/manage-projects');
