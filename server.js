@@ -1,6 +1,5 @@
 var express = require('express'),
-    path = require('path'),
-    fs = require('fs'),
+    path = require('path'),    
     Firebase = require('firebase'),
     fb = new Firebase('https://manifest.firebaseio.com/env'),
     app = express();
@@ -17,8 +16,7 @@ app.get('/js/getEnv', function(req, res){
 });
 
 app.use('/', function(req, res){
-    res.sendFile(__dirname + '/index.html');
-    console.log(req.params);
+    res.sendFile(__dirname + '/index.html');    
 });
 
 app.listen(process.env.PORT || 3000, function(){

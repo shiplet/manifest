@@ -1,6 +1,6 @@
 var app = angular.module('manifest');
 
-app.service('envService', function($window, $http, $firebaseArray, $firebaseObject){
+app.service('envService', function($window, $http, $firebaseArray, $firebaseObject, $q){
     return {
 	getEnv: function() {
 	    return $http({
@@ -11,10 +11,6 @@ app.service('envService', function($window, $http, $firebaseArray, $firebaseObje
 	    }, function(error){
 		return error;
 	    });
-	},
-	getFirebase: function() {
-	    return $firebaseObject(new Firebase($window.env.firebase));
 	}
-	
     };
 });

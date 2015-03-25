@@ -2,32 +2,29 @@ var app = angular.module('manifest');
 
 app.service('googleService', function(envService, $timeout, $location, $http, $q, $window, $localStorage, $sessionStorage){
     var accessCode, authToken, authUrl, x;
-    envService.getEnv().then(function(r){	
-	authUrl = r.a+'scope='+r.f+'&redirect_uri='+r.e+'&response_type='+r.c+'&client_id='+r.d;
-    });
 
     var tokens = $sessionStorage.$default();
 
     var getToken = function(token) {
-	envService.getEnv().then(function(r){
-	    if (token === $location.absUrl()) {
-		console.log('Not authenticated yet');
-	    } else {
-		var deferred = $q.defer();
+	if (token === $location.absUrl()) {
+	    console.log('Not authenticated yet');
+	} else {
+	    envService.getEnv().then(function(x){
+		var deferred = $q.defer();		
 		$http({
-			method: 'POST',
-			url: r.b+'code='+token+'&client_id='+r.d+'&client_secret='+r.g+'&redirect_uri='+r.e+'&grant_type=authorization_code'
-		}).then(function(success){
-			tokens.authToken = success.data.access_token;
-			$location.path('/manage-projects');
-		}, function(error){
-			if (error.status === 400) {
-			    console.error('This session has not authenticated yet.');
-			}
-		});
-		return deferred.promise;
-	    }
-	});	
+	    	    method: 'POST',
+	    	    url: x.b+'code='+token+'&client_id='+x.d+'&client_secret='+x.g+'&redirect_uri='+x.e+'&grant_type=authorization_code'
+	    	}).then(function(success){
+	    	    tokens.authToken = success.data.access_token;
+	    	    $location.path('/manage-projects');
+	    	}, function(error){
+	    	    if (error.status === 400) {
+	    		console.error('This session has not authenticated yet.');
+	    	    }
+	    	});
+	    	return deferred.promise;		
+	    });	  
+	}
     };
     
     return {
@@ -43,7 +40,10 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 	    },
 	    mobile: {
 		session: function() {
-		    window.location.assign(authUrl);
+		    envService.getEnv().then(function(x){
+			authUrl = x.a+'scope='+x.f+'&redirect_uri='+x.e+'&response_type='+x.c+'&client_id='+x.d;
+			window.location.assign(authUrl);
+		    });		    		    
 		},
 		token: function() {		    
 		    var url = $location.absUrl(),
@@ -95,40 +95,42 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 	},
 	request: {
 	    calEvents: function(id) {
-		$localStorage.userCalId = id;
 		var deferred = $q.defer();
-		$http({
-		    method: 'GET',
-		    url: x.i+'calendars/'+id+'/events?access_token='+tokens.authToken
-		}).then(function(success){
-		    var y = success.data.items;
-		    var x = y.filter(function(z){
-		    	if (z.status !== 'cancelled') {
-		    	    return z;
-		    	}
-		    });
-		    x.map(function(y){
-		    	if (y.status !== 'cancelled'){
-		    	    if (y.start.hasOwnProperty('date')){
-		    		y.start.date = Date.parse(y.start.date);
-		    		y.date = y.start.date;
-		    		y.end.date = Date.parse(y.end.date);
-		    		y.duration = (y.end.date - y.start.date) / 3600000;
-		    	    } else if (y.start.hasOwnProperty('dateTime')) {
-		    		y.start.dateTime = Date.parse(y.start.dateTime);
-		    		y.date = y.start.dateTime;
-		    		y.end.dateTime = Date.parse(y.end.dateTime);
-		    		y.duration = (y.end.dateTime - y.start.dateTime) / 3600000;
-		    	    }			    
-		    	}
-			y.isUpdating = false;
-		    });
-		    deferred.resolve(x);
-		}, function(error){
-		    deferred.reject(error);
-		    console.log(error);
+		envService.getEnv().then(function(x){
+		    $localStorage.userCalId = id;		   
+		    $http({
+			method: 'GET',
+			url: x.i+'calendars/'+id+'/events?access_token='+tokens.authToken
+		    }).then(function(success){
+			var y = success.data.items;
+			var x = y.filter(function(z){
+		    	    if (z.status !== 'cancelled') {
+		    		return z;
+		    	    }
+			});
+			x.map(function(y){
+		    	    if (y.status !== 'cancelled'){
+		    		if (y.start.hasOwnProperty('date')){
+		    		    y.start.date = Date.parse(y.start.date);
+		    		    y.date = y.start.date;
+		    		    y.end.date = Date.parse(y.end.date);
+		    		    y.duration = (y.end.date - y.start.date) / 3600000;
+		    		} else if (y.start.hasOwnProperty('dateTime')) {
+		    		    y.start.dateTime = Date.parse(y.start.dateTime);
+		    		    y.date = y.start.dateTime;
+		    		    y.end.dateTime = Date.parse(y.end.dateTime);
+		    		    y.duration = (y.end.dateTime - y.start.dateTime) / 3600000;
+		    		}			    
+		    	    }
+			    y.isUpdating = false;
+			});
+			deferred.resolve(x);
+		    }, function(error){
+			deferred.reject(error);
+			console.log(error);
+		    });		   
 		});
-		return deferred.promise;
+		return deferred.promise; 		
 	    },
 	    newEvent: function(event) {
 		var title, startDate, endDate;
@@ -142,56 +144,62 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 		    title = event.newProject.toUpperCase()+event.subProject+': '+event.description;
 		}		
 		var deferred = $q.defer();
-		$http({
-		    method: 'POST',
-		    url: x.i+'calendars/'+$localStorage.userCalId+'/events?access_token='+tokens.authToken,
-		    data: {
-			summary: title,
-			start: {
-			    dateTime: moment(event.startDate).format()
-			},
-			end: {
-			    dateTime: moment(event.endDate).format()
+		envService.getEnv().then(function(x){
+		    $http({
+			method: 'POST',
+			url: x.i+'calendars/'+$localStorage.userCalId+'/events?access_token='+tokens.authToken,
+			data: {
+			    summary: title,
+			    start: {
+				dateTime: moment(event.startDate).format()
+			    },
+			    end: {
+				dateTime: moment(event.endDate).format()
+			    }
 			}
-		    }
-		}).then(function(response) {
-		    deferred.resolve(response);
-		}, function(error) {
-		    deferred.reject(error);
-		});
+		    }).then(function(response) {
+			deferred.resolve(response);
+		    }, function(error) {
+			deferred.reject(error);
+		    });
+		});		
 		return deferred.promise;
 	    },
 	    updateEvent: function(event) {
 		var deferred = $q.defer();
-		$http({
-		    method: 'PUT',
-		    url: x.i+'calendars/'+$localStorage.userCalId+'/events/'+event.id+'?access_token='+tokens.authToken,
-		    data: {
-			summary: event.update.summary ? event.update.summary : event.summary,
-			start: {
-			    dateTime: event.update.startDate ? moment(event.update.startDate).format() : moment(event.start.dateTime).format()
-			},
-			end: {
-			    dateTime: event.update.endDate ? moment(event.update.endDate).format() : moment(event.end.dateTime).format()
+		envService.getEnv().then(function(x){
+		    $http({
+			method: 'PUT',
+			url: x.i+'calendars/'+$localStorage.userCalId+'/events/'+event.id+'?access_token='+tokens.authToken,
+			data: {
+			    summary: event.update.summary ? event.update.summary : event.summary,
+			    start: {
+				dateTime: event.update.startDate ? moment(event.update.startDate).format() : moment(event.start.dateTime).format()
+			    },
+			    end: {
+				dateTime: event.update.endDate ? moment(event.update.endDate).format() : moment(event.end.dateTime).format()
+			    }
 			}
-		    }
-		}).then(function(response){
-		    deferred.resolve(response);
-		}, function(error){
-		    deferred.reject(error);
-		});
+		    }).then(function(response){
+			deferred.resolve(response);
+		    }, function(error){
+			deferred.reject(error);
+		    });
+		});		
 		return deferred.promise;
 	    },
 	    deleteEvent: function(id) {
 		var deferred = $q.defer();
-		$http({
-		    method: 'DELETE',
-		    url: x.i+'calendars/'+$localStorage.userCalId+'/events/'+id+'?access_token='+tokens.authToken
-		}).then(function(success){
-		    deferred.resolve(success);
-		}, function(error){
-		    deferred.reject(error);
-		});
+		envService.getEnv().then(function(x){
+		    $http({
+			method: 'DELETE',
+			url: x.i+'calendars/'+$localStorage.userCalId+'/events/'+id+'?access_token='+tokens.authToken
+		    }).then(function(success){
+			deferred.resolve(success);
+		    }, function(error){
+			deferred.reject(error);
+		    });
+		});		
 		return deferred.promise;
 	    }	    
 	}
