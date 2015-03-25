@@ -1,0 +1,175 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.bump {
+    margin: 25px;
+}
+
+.small-bump {
+    margin: 15px;
+}
+
+.top-bump {
+    margin-top: 25px;
+}
+
+.small-top-bump {
+    margin-top: 15px;
+}
+
+.bottom-bump {
+    margin-bottom: 25px;
+}
+
+.small-bottom-bump {
+    margin-bottom: 15px;
+}
+
+.centered {
+    height: 100%;
+    width: 100%;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    display: -webkit-flex;
+    -webkit-align-items: center;
+    -webkit-justify-content: center;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    display: -webkit-flex;
+    -webkit-flex-direction: column;
+    -webkit-align-items: center;
+
+    position: relative;
+}
+
+.logo img {
+    width: 600px;
+}
+
+.container-hidden {
+    display: none;
+}
+
+.outline {
+    outline: 1px solid black;
+}
+
+.btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus {
+  outline: none;
+  outline: none;
+}
+
+.project-header {
+    height: 100px;
+}
+
+.project-header img {
+    width: 180px;
+    margin: 15px;
+}
+
+.event-list {
+    position: relative;
+}
+
+.delete {
+    height: 25px;
+    width: 25px;
+}
+
+.delete a {
+    display: block;
+    text-align: center;
+    color: #C9302C;
+}
+
+.delete a:hover {
+    text-decoration: none;
+}
+
+.right {
+    position: absolute;
+    right: -15px;
+    top: -20px;
+}
+
+.partial {
+    width: 90%;
+}
+
+.overlay {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.logOut-popup {
+    display: block;
+    position: relative;
+    top: calc(75vh / 2);
+    left: calc(75vw / 2);
+}
+
+.hover:hover {
+    cursor: pointer;
+}
+
+.popup-btn {
+    width: 100%;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    display: -webkit-flex;
+    -webkit-align-items: center;
+    -webkit-justify-content: center;
+}
+
+.timeStamp {
+    font-weight: normal;
+    color: #449d44;
+}
+
+@media all and (max-width: 568px) {    
+    .logo {
+	margin: 50px auto;
+    }
+
+    .logo img {
+	display: block;
+	max-width: 280px;
+	margin: 0 auto;
+    }
+    
+    .logo h1 {
+	font-size: 4rem;
+	top: 45px;
+	left: 5px;
+	letter-spacing: 2rem;	
+    }
+
+    .button {
+	margin: 25px auto;	
+    }
+
+    .button button {
+	display: block;
+	margin: 0 auto;
+    }
+}

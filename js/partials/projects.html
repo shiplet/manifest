@@ -1,0 +1,157 @@
+<header class="project-header">
+  <img class="pull-right hover" ng-click="exit()" src="assets/logo_dark.svg">
+</header>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-success" ng-show="showIdInput">
+	<div class="panel-heading">Enter Your Calendar Id</div>
+	<div class="panel-body">
+	  <form role="form" name="idFields">
+	    <input class="form-control" ng-model="user.calendarId" placeholder="Email address tied to your calendar" autofocus required>
+	    <button class="btn btn-success small-bump" ng-click="requestEvents()" ng-disabled="idFields.$invalid">Submit</button>
+	  </form>
+	</div>
+      </div>
+
+
+      <div class="panel panel-info" ng-show="showCrudFields">
+	<div class="panel-heading">
+	  <h3>ID: {{crudHeader}}</h3>
+	</div>
+	<div class="panel-body">
+	  <button class="btn btn-info btn-lg small-bottom-bump" ng-click="displayLog()">Log Time</button>
+	  <form name="newEventLog" ng-show="showLogFields">
+	    <select class="form-control" ng-model="newEvent.project">
+	      <option value="" selected>Select Existing Project</option>
+	      <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
+	    </select>
+	    <!-- Project Headers -->
+	    <div class="form-group flex">
+	      <input type="text" class="form-control small-bump" placeholder="Create New Project" ng-model="newEvent.newProject" ng-hide="newEvent.project" autofocus>	      
+	      <input type="text" class="form-control small-bump" placeholder="Subproject" ng-model="newEvent.subProject">
+	    </div>
+	    
+	    <input type="text" class="form-control small-bottom-bump" placeholder="Description" ng-model="newEvent.description" required>
+
+	    <!-- Date Time Fields -->
+	    <div class="form-group">
+	      <div class="col-md-6">
+		<div>
+		  <label for="startDate">Start</label>
+		  <input id="startDate" type="datetime-local" class="form-control" placeholder="mm/dd/yyyy" ng-model="newEvent.startDate" required>
+		</div>
+	      </div>	     
+	      
+	      <div class="col-md-6">
+		<div>
+		  <label for="endDate">End</label>
+		  <input id="endDate" type="datetime-local" class="form-control" placeholder="mm/dd/yyyy" ng-model="newEvent.endDate" required>
+		</div>
+	      </div>
+	    </div>
+	    
+	    <div class="row">
+	      <div class="col-md-6">
+		<button class="btn btn-info centered small-top-bump" ng-click="submitNewEvent()" ng-disabled="!newEvent.project && !newEvent.newProject || newEventLog.$invalid">Submit</button>
+	      </div>
+	      <div class="col-md-6">
+		<button class="btn centered small-top-bump" ng-click="displayLog()">Cancel</button>
+	      </div>
+	    </div>
+	  </form>
+	</div>
+      </div>
+    </div>
+
+   
+    <div class="col-md-6">
+      <div class="panel panel-info" ng-show="showCrudFields">
+	<div class="panel-heading">
+	  <h3>Returned Cal Data</h3>
+	</div>
+	<div class="panel-body">
+	  <!-- Standard Event View -->
+	  <div ng-repeat="event in events | filter: newEvent.project | orderBy:['date']:true" class="event-list">
+	    <div ng-hide="event.isUpdating">
+	      <h3 class="hover" ng-click="updateEvent(event)">{{event.summary}}</h3>
+	      <p class="hover" ng-click="updateEvent(event)"><em>{{event.date | date:'mediumDate'}} from {{event.start.dateTime | date:'shortTime'}} to {{event.end.dateTime | date:'shortTime'}}</em></p>
+	      <p>{{event.duration}} hour(s)</p>
+	      <div class="delete right"><a title="Delete this event" class="hover" ng-click="deleteCheck(event.id)">&times;</a></div>
+	      <hr>
+	    </div>
+
+	    <!-- Update Event View -->
+	    <div ng-show="event.isUpdating">
+	      <form>
+		<label for="updateTitle">{{event.summary}}</label>
+		<input name="updateTitle" type="text" class="form-control" ng-model="event.update.summary" ng-init="event.update.summary = event.summary" autofocus>
+		
+		<div class="form-group">
+		  <div class="small-top-bump col-md-6">
+		    <label for="startDate">Start - <span class="timeStamp">{{event.start.dateTime | date:'medium'}}</span></label>
+		    <input id="startDate" type="datetime-local" class="form-control" placeholder="mm/dd/yyyy" ng-model="event.update.startDate">
+		  </div>
+		  
+		  <div class="small-top-bump col-md-6">
+		    <label for="endDate">End - <span class="timeStamp">{{event.end.dateTime | date:'medium'}}</span></label>
+		    <input id="endDate" type="datetime-local" class="form-control" placeholder="mm/dd/yyyy" ng-model="event.update.endDate">
+		  </div>
+		</div>
+		<div class="row">
+		  <div class="col-md-6">
+		    <button class="btn btn-info centered small-top-bump" ng-click="submitUpdate(event)">Save</button>
+		  </div>
+		  <div class="col-md-6">
+		    <button class="btn centered small-top-bump" ng-click="updateEvent(event)">Cancel</button>
+		  </div>
+		</div>
+		<hr>
+	      </form>
+	    </div>
+	    
+	  </div>	
+	</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="overlay" ng-show="showOverlay" ng-click="cancel()">
+    <div class="row">
+      <div class="logOut-popup centered" ng-show="logOutPop">
+	<div class="col-md-3">
+	  <div class="panel panel-info">
+	    <div class="panel-heading centered"><h3>Log out?</h3></div>
+	    <div class="panel-body">
+	      <div class="row">
+		<div class="col-md-6">
+		  <button class="btn btn-danger popup-btn" ng-click="logOut()">Yes</button>
+		</div>
+		<div class="col-md-6">
+		  <button class="btn popup-btn" ng-click="cancel()">Cancel</button>
+		</div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <div class="logOut-popup" ng-show="deletePop">
+	<div class="col-md-3">
+	  <div class="panel panel-info">
+	    <div class="panel-heading centered"><h3>Are you sure?</h3></div>
+	    <div class="panel-footer">
+	      <div class="row">
+		<div class="col-md-6">
+		  <button class="btn btn-danger popup-btn" ng-click="deleteEvent()">Yes</button>
+		</div>
+		<div class="col-md-6">
+		  <button class="btn popup-btn" ng-click="cancel()">Cancel</button>
+		</div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
