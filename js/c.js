@@ -1,7 +1,6 @@
 var app = angular.module('manifest');
 
 app.controller('MainController', function($rootScope, $scope, envService, googleService, $location, $sessionStorage, $state){
-
     $scope.authenticate = function() {
 	if (!$sessionStorage.authToken) {
 	    googleService.authenticate.mobile.session();

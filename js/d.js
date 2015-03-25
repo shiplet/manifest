@@ -13,19 +13,20 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 	if (token === $location.absUrl()) {
 	    console.log('Not authenticated yet');
 	} else {
-	    var deferred = $q.defer();
-	    $http({
-		method: 'POST',
-		url: x.b+'code='+token+'&client_id='+x.d+'&client_secret='+x.g+'&redirect_uri='+x.e+'&grant_type=authorization_code'
-	    }).then(function(success){
-		tokens.authToken = success.data.access_token;
-		$location.path('/manage-projects');
-	    }, function(error){
-		if (error.status === 400) {
-		    console.error('This session has not authenticated yet.');
-		}
-	    });
-	    return deferred.promise;
+	    console.log(x);
+	    // var deferred = $q.defer();
+	    // $http({
+	    // 	method: 'POST',
+	    // 	url: x.b+'code='+token+'&client_id='+x.d+'&client_secret='+x.g+'&redirect_uri='+x.e+'&grant_type=authorization_code'
+	    // }).then(function(success){
+	    // 	tokens.authToken = success.data.access_token;
+	    // 	$location.path('/manage-projects');
+	    // }, function(error){
+	    // 	if (error.status === 400) {
+	    // 	    console.error('This session has not authenticated yet.');
+	    // 	}
+	    // });
+	    // return deferred.promise;
 	}
     };
     
