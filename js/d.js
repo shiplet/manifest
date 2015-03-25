@@ -1,9 +1,12 @@
 var app = angular.module('manifest');
 
 app.service('googleService', function(envService, $timeout, $location, $http, $q, $window, $localStorage, $sessionStorage){
-    var x = envService.getEnv(),
-	authUrl = x.a+'scope='+x.f+'&redirect_uri='+x.e+'&response_type='+x.c+'&client_id='+x.d,
-	accessCode, authToken;
+    var accessCode, authToken, authUrl, x;
+    envService.getEnv().then(function(response){
+	x = response;
+	authUrl = x.a+'scope='+x.f+'&redirect_uri='+x.e+'&response_type='+x.c+'&client_id='+x.d;
+    });
+
 
     var tokens = $sessionStorage.$default();
 
