@@ -21,13 +21,13 @@
 	  <h3>ID: {{crudHeader}}</h3>
 	</div>
 	<div class="panel-body">
-	  <button class="btn btn-info btn-lg small-bottom-bump" ng-click="displayLog()">Log Time</button>
-	  <form name="newEventLog" ng-show="showLogFields">
-	    <select class="form-control" ng-model="newEvent.project">
-	      <option value="" selected>Select Existing Project</option>
+	  <select class="form-control small-bottom-bump" ng-model="newEvent.project">
+	      <option value="" selected>All Projects</option>
 	      <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
 	    </select>
-	    <!-- Project Headers -->
+	  <button class="btn btn-info btn-lg small-bottom-bump" ng-click="displayLog()">Log Time</button>
+	  <form name="newEventLog" ng-show="showLogFields" novalidate>	    
+	    <!-- Project Title Fields -->
 	    <div class="form-group flex">
 	      <input type="text" class="form-control small-bump" placeholder="Create New Project" ng-model="newEvent.newProject" ng-hide="newEvent.project" autofocus>	      
 	      <input type="text" class="form-control small-bump" placeholder="Subproject" ng-model="newEvent.subProject">
@@ -69,7 +69,7 @@
     <div class="col-md-6">
       <div class="panel panel-info" ng-show="showCrudFields">
 	<div class="panel-heading">
-	  <h3>Returned Cal Data</h3>
+	  <h3>Currently Logged Events</h3>
 	</div>
 	<div class="panel-body">
 	  <!-- Standard Event View -->

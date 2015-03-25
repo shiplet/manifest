@@ -7,7 +7,7 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 
     var getToken = function(token) {
 	if (token === $location.absUrl()) {
-	    console.log('Not authenticated yet');
+	    console.warn('Not authenticated');
 	} else {
 	    envService.getEnv().then(function(x){
 		var deferred = $q.defer();		

@@ -146,6 +146,13 @@ html, body {
     color: #449d44;
 }
 
+@media all and (max-width: 991px) {
+    .logOut-popup {
+	left: 0px;
+	padding: 0px 20%;
+    }
+}
+
 @media all and (max-width: 568px) {    
     .logo {
 	margin: 50px auto;

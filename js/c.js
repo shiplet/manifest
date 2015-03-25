@@ -1,5 +1,7 @@
 var app = angular.module('manifest');
 
+/// Main Controller ///
+
 app.controller('MainController', function($rootScope, $scope, envService, googleService, $location, $sessionStorage, $state){
     $scope.authenticate = function() {
 	if (!$sessionStorage.authToken) {
@@ -21,6 +23,8 @@ app.controller('MainController', function($rootScope, $scope, envService, google
 });
 
 
+/// Project View Controller ///
+
 app.controller('ProjectController', function($scope, envService, googleService, $location, $sessionStorage, $localStorage, $q, $stateParams) {    
     $scope.showIdInput = true;
     $scope.showCrudFields = false;
@@ -32,19 +36,24 @@ app.controller('ProjectController', function($scope, envService, googleService, 
     $scope.updating = false;
     var eventId;
 
-
-    googleService.authenticate.load().then(function(response){
-    	if (response === 'auth') {
-    	    $scope.showIdInput = false;
-    	    $scope.crudHeader = $localStorage.userCalId;	
-    	    $scope.showCrudFields = true;
-    	    googleService.request.calEvents($localStorage.userCalId)
-    		.then(function(response){		   
-    		    $scope.events = response;
-    		    $scope.parseProjects(response);
-    		});
-    	}
-    });
+    if (!$sessionStorage.projects && !$sessionStorage.authToken) {
+	$location.path('/');
+	console.warn('No project data');
+    } else {
+	googleService.authenticate.load().then(function(response){
+    	    if (response === 'auth') {
+    		$scope.showIdInput = false;
+    		$scope.crudHeader = $localStorage.userCalId;	
+    		$scope.showCrudFields = true;
+    		googleService.request.calEvents($localStorage.userCalId)
+    		    .then(function(response){		   
+    			$scope.events = response;
+    			$scope.parseProjects(response);
+    		    });
+    	    }
+	});		
+    }
+  
 
     $scope.requestEvents = function() {
 	googleService.request.calEvents($scope.user.calendarId).then(function(response){
@@ -137,5 +146,4 @@ app.controller('ProjectController', function($scope, envService, googleService, 
 	    $scope.showLogFields = false;
 	}
     };
-
 });

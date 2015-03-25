@@ -7,12 +7,13 @@ var express = require('express'),
 app.use(express.static(__dirname));
 
 app.get('/js/getEnv', function(req, res){
-    console.log('File requested at /js/getEnv');
     fb.on('value', function(snapshot){
 	res.json(snapshot.val());
+	res.end();
     }, function(error){
 	console.log(error);
     });
+    console.log('REQUEST HEADERS: \n' + JSON.stringify(req.headers));
 });
 
 app.use('/', function(req, res){
