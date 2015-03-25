@@ -1,4 +1,4 @@
-window.env = {
-    "firebase": "https://manifest.firebaseio.com/production-env"
-};
+// window.env = {
+//     "firebase": "https://manifest.firebaseio.com/production-env"
+// };
 
