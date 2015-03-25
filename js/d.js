@@ -1,7 +1,7 @@
 var app = angular.module('manifest');
 
 app.service('googleService', function(envService, $timeout, $location, $http, $q, $window, $localStorage, $sessionStorage){
-    var accessCode, authToken, authUrl, x;
+    var accessCode, authToken;
 
     var tokens = $sessionStorage.$default();
 
@@ -29,19 +29,10 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
     
     return {
 	authenticate: {
-	    load: function() {
-		var holdForAuth = $q.defer();
-		if (!$localStorage.userCalId) {
-		    holdForAuth.resolve('No user calendars specified');
-		} else {		    
-		    holdForAuth.resolve('auth');
-		}
-		return holdForAuth.promise;
-	    },
 	    mobile: {
 		session: function() {
 		    envService.getEnv().then(function(x){
-			authUrl = x.a+'scope='+x.f+'&redirect_uri='+x.e+'&response_type='+x.c+'&client_id='+x.d;
+			var authUrl = x.a+'scope='+x.f+'&redirect_uri='+x.e+'&response_type='+x.c+'&client_id='+x.d;
 			window.location.assign(authUrl);
 		    });		    		    
 		},
@@ -58,6 +49,15 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 		    $location.search('code', null);
 		    getToken(token);
 		}
+	    },
+	    load: function() {
+		var holdForAuth = $q.defer();
+		if (!$localStorage.userCalId) {
+		    holdForAuth.resolve('No user calendars specified');
+		} else {		    
+		    holdForAuth.resolve('auth');
+		}
+		return holdForAuth.promise;
 	    },
 	    session: function() {
 		var holdForAuth = $q.defer();
