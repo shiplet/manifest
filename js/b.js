@@ -1,18 +1,20 @@
 var app = angular.module('manifest');
 
-app.service('envService', function($window, $q, $http){
+app.service('envService', function($window, $http, $firebaseArray, $firebaseObject){
     return {
 	getEnv: function() {
-	    var deferred = $q.defer();
-	    $http({
+	    return $http({
 		method: 'GET',
-		url: './js/e.json'
+		url: 'js/getEnv'
 	    }).then(function(success){
-		deferred.resolve(success.data);
+		return success;
 	    }, function(error){
-		deferred.reject(error);
+		return error;
 	    });
-	    return deferred.promise;
+	},
+	getFirebase: function() {
+	    return $firebaseObject(new Firebase($window.env.firebase));
 	}
+	
     };
 });

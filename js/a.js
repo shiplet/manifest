@@ -1,4 +1,4 @@
-var app = angular.module('manifest', ['ngStorage', 'ui.router']);
+var app = angular.module('manifest', ['ngStorage', 'ui.router', 'firebase']);
 
 app.config(function($stateProvider, $urlRouterProvider, $locationProvider){
     $urlRouterProvider.otherwise('/');
