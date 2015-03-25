@@ -10,6 +10,9 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
     var tokens = $sessionStorage.$default();
 
     var getToken = function(token) {
+	envService.getEnv().then(function(response){
+	    x = response.data; 
+	});
 	if (token === $location.absUrl()) {
 	    console.log('Not authenticated yet');
 	} else {
