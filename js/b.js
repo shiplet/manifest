@@ -6,7 +6,7 @@ app.service('envService', function($window, $q, $http){
 	    var deferred = $q.defer();
 	    $http({
 		method: 'GET',
-		url: '/js/e.json'
+		url: './js/e.json'
 	    }).then(function(success){
 		deferred.resolve(success.data);
 	    }, function(error){
