@@ -13,6 +13,16 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider){
 	    url: '/manage-projects',
 	    templateUrl: './js/partials/projects.html',
 	    controller: 'ProjectController'
+	})
+	.state('invoicing', {
+	    url: '/invoicing',
+	    templateUrl: './js/partials/invoicing.html',
+	    controller: 'InvoiceController',
+	    resolve: {
+		getInvoiceProjects: function($sessionStorage){
+		    return $sessionStorage.invoiceProjects;
+		}
+	    }
 	});
 });
 

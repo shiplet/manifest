@@ -55,7 +55,7 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 		if (!$localStorage.userCalId) {
 		    holdForAuth.resolve('No user calendars specified');
 		} else {		    
-		    holdForAuth.resolve('auth');
+		    holdForAuth.resolve('cal');
 		}
 		return holdForAuth.promise;
 	    },
@@ -103,12 +103,12 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 			url: x.i+'calendars/'+id+'/events?access_token='+tokens.authToken
 		    }).then(function(success){
 			var y = success.data.items;
-			var x = y.filter(function(z){
+		    	var x = y.filter(function(z){
 		    	    if (z.status !== 'cancelled') {
 		    		return z;
 		    	    }
-			});
-			x.map(function(y){
+		    	});
+		    	x.map(function(y){
 		    	    if (y.status !== 'cancelled'){
 		    		if (y.start.hasOwnProperty('date')){
 		    		    y.start.date = Date.parse(y.start.date);
@@ -122,15 +122,13 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 		    		    y.duration = (y.end.dateTime - y.start.dateTime) / 3600000;
 		    		}			    
 		    	    }
-			    y.isUpdating = false;
-			});
-			deferred.resolve(x);
+		    	    y.isUpdating = false;
+		    	});
+		    	deferred.resolve(x);
 		    }, function(error){
-			if (error.status === 401) {
-			    deferred.resolve(error);
-			}
-		     });		   
-		 });
+		     	deferred.reject(error);
+		    });		   
+		});
 		return deferred.promise; 		
 	    },
 	    newEvent: function(event) {

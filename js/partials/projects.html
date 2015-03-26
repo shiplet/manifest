@@ -109,7 +109,7 @@
 	    <div ng-hide="event.isUpdating">
 	      <h3 class="hover" ng-click="updateEvent(event)">{{event.summary}}</h3>
 	      <p class="hover" ng-click="updateEvent(event)"><em>{{event.date | date:'mediumDate'}} from {{event.start.dateTime | date:'shortTime'}} to {{event.end.dateTime | date:'shortTime'}}</em></p>
-	      <p>{{event.duration}} hour(s)</p>
+	      <p ng-class="{red: event.duration > 12}">{{event.duration}} hour(s)</p>
 	      <div class="delete right"><a title="Delete this event" class="hover" ng-click="deleteCheck(event.id)">&times;</a></div>
 	      <hr>
 	    </div>

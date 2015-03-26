@@ -18,24 +18,29 @@ app.service('envService', function($window, $http, $firebaseArray, $firebaseObje
 	    var iEnd = moment(invoice.endDate).add(1, 'days');
 	    var start = moment(invoice.startDate).format('MMM Do YYYY, h:mm:ss a');
 	    var end = moment(iEnd).format('MMM Do YYYY, h:mm:ss a');
-	    var projects = [];
-	    // var p = events.filter(function(x){
-	    // 	if (x.summary.split(':')[0] === project) {
-	    // 	    return x;
-	    // 	}
-	    // });
-	    events.forEach(function(i){
-		var eStart = i.start.dateTime;
-		var eEnd = i.end.dateTime;
-		if (eStart > iStart && eEnd < iEnd) {
-		    console.log(i.summary);
-		    console.log('iStart: ', moment(iStart).format('MMM Do YYYY, h:mm:ss a'));
-		    console.log('eStart: ', moment(eEnd).format('MMM Do YYYY, h:mm:ss a'));
-		    console.log('eEnd: ', moment(eEnd).format('MMM Do YYYY, h:mm:ss a'));
-		    console.log('iEnd: ', moment(iEnd).format('MMM Do YYYY, h:mm:ss a'));
-		    console.log('\n');
-		}
+	    var edgeCount = 0;
+	    var p = events.filter(function(i){
+	    	var eStart = i.start.dateTime;
+	    	var eEnd = i.end.dateTime;
+	    	var iProject = i.summary ? (i.summary.indexOf(':') !== -1 ? i.summary.split(':')[0] : i.summary.split(' ')[0].toUpperCase()) : undefined;
+	    	if (iProject
+	    	    && iProject === project
+	    	    && eStart > iStart) {
+		    if (eStart < iEnd && eEnd > iEnd) {
+			edgeCount++;
+			return i;
+		    } else if (eEnd < iEnd) {
+			return i;
+		    }
+	    	}
 	    });
+	    if (p.length === 0) {
+		alert('No events in that range');
+	    }
+	    if (edgeCount) {
+		alert('Heads up: you\'re invoicing an event that exceeds your date range.');
+	    }
+	    return p;
 	}
     };
 });

@@ -160,6 +160,10 @@ html, body {
     font-size: 1.25rem;
 }
 
+.red {
+    color: red;
+}
+
 @media all and (max-width: 991px) {
     .logOut-popup {
 	left: 0px;
