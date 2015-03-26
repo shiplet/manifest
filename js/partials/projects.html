@@ -9,7 +9,7 @@
 	<div class="panel-heading">Enter Your Calendar Id</div>
 	<div class="panel-body">
 	  <form role="form" name="idFields">
-	    <input class="form-control" ng-model="user.calendarId" placeholder="Email address tied to your calendar" autofocus required>
+	    <input type="email" class="form-control" ng-model="user.calendarId" placeholder="Email address tied to your calendar" autofocus required>
 	    <button class="btn btn-success small-bump" ng-click="requestEvents()" ng-disabled="idFields.$invalid">Submit</button>
 	  </form>
 	</div>
