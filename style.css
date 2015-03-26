@@ -64,7 +64,7 @@ html, body {
     outline: 1px solid black;
 }
 
-.btn {
+.btn-cancel {
     background-color: rgb(192, 192, 192);
 }
 
@@ -149,6 +149,15 @@ html, body {
 .timeStamp {
     font-weight: normal;
     color: #449d44;
+}
+
+.button-bump {
+    margin: 0px 2%;
+    width: 50%;
+}
+
+.button-bump input {
+    font-size: 1.25rem;
 }
 
 @media all and (max-width: 991px) {

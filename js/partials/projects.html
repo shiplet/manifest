@@ -26,6 +26,7 @@
 	      <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
 	    </select>
 	  <button class="btn btn-info btn-lg small-bottom-bump" ng-click="displayLog()">Log Time</button>
+	  <button class="btn btn-info btn-lg small-bottom-bump" ng-click="displayInvoice()">Create Invoice</button>
 	  <form name="newEventLog" ng-show="showLogFields" novalidate>	    
 	    <!-- Project Title Fields -->
 	    <div class="form-group flex">
@@ -57,14 +58,27 @@
 		<button class="btn btn-info centered small-top-bump" ng-click="submitNewEvent()" ng-disabled="!newEvent.project && !newEvent.newProject || newEventLog.$invalid">Submit</button>
 	      </div>
 	      <div class="col-md-6">
-		<button class="btn centered small-top-bump" ng-click="displayLog()">Cancel</button>
+		<button class="btn btn-cancel centered small-top-bump" ng-click="displayLog()">Cancel</button>
+	      </div>
+	    </div>
+	    <hr>
+	  </form>
+	  <form name="makeInvoiceForm" ng-show="showInvoiceFields">
+	    <div class="flex">
+	      <div class="button-bump">
+		<label for="invoiceStartDate">Start Date</label>
+		<input id="invoiceStartDate" type="date" class="form-control" placeholder="mm/dd/yyyy" ng-model="newInvoice.startDate" required>
+	      </div>
+	      <div class="button-bump">
+		<label for="invoiceEndDate">End Date</label>
+		<input id="invoiceEndDate" type="date" class="form-control" placeholder="mm/dd/yyyy" ng-model="newInvoice.endDate" required>
 	      </div>
 	    </div>
 	  </form>
 	</div>
       </div>
     </div>
-
+    
    
     <div class="col-md-6">
       <div class="panel panel-info" ng-show="showCrudFields">
@@ -104,7 +118,7 @@
 		    <button class="btn btn-info centered small-top-bump" ng-click="submitUpdate(event)">Save</button>
 		  </div>
 		  <div class="col-md-6">
-		    <button class="btn centered small-top-bump" ng-click="updateEvent(event)">Cancel</button>
+		    <button class="btn btn-cancel centered small-top-bump" ng-click="updateEvent(event)">Cancel</button>
 		  </div>
 		</div>
 		<hr>
@@ -129,7 +143,7 @@
 		  <button class="btn btn-danger popup-btn" ng-click="logOut()">Yes</button>
 		</div>
 		<div class="col-md-6">
-		  <button class="btn popup-btn" ng-click="cancel()">Cancel</button>
+		  <button class="btn btn-cancel popup-btn" ng-click="cancel()">Cancel</button>
 		</div>
 	      </div>
 	    </div>
@@ -146,7 +160,7 @@
 		  <button class="btn btn-danger popup-btn" ng-click="deleteEvent()">Yes</button>
 		</div>
 		<div class="col-md-6">
-		  <button class="btn popup-btn" ng-click="cancel()">Cancel</button>
+		  <button class="btn btn-cancel popup-btn" ng-click="cancel()">Cancel</button>
 		</div>
 	      </div>
 	    </div>

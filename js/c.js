@@ -34,6 +34,7 @@ app.controller('ProjectController', function($scope, envService, googleService, 
     $scope.showLogFields = false;
     $scope.notUpdating = true;
     $scope.updating = false;
+    $scope.showInvoiceFields = false;
     var eventId;
 
     if (!$sessionStorage.projects && !$sessionStorage.authToken) {
@@ -146,4 +147,8 @@ app.controller('ProjectController', function($scope, envService, googleService, 
 	    $scope.showLogFields = false;
 	}
     };
+
+    $scope.displayInvoice = function() {
+	!$scope.showInvoiceFields ? $scope.showInvoiceFields = true : $scope.showInvoiceFields = false;
+    }
 });
