@@ -123,6 +123,9 @@ app.controller('ProjectController', function($scope, envService, googleService, 
 	delete $sessionStorage.authToken;
 	delete $sessionStorage.loggedIn;
 	delete $sessionStorage.projects;
+	if ($sessionStorage.oldToken) {
+	    delete $sessionStorage.oldToken;
+	}
 	$location.path('/');
     };
 
