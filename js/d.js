@@ -16,6 +16,7 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 	    	    url: x.b+'code='+token+'&client_id='+x.d+'&client_secret='+x.g+'&redirect_uri='+x.e+'&grant_type=authorization_code'
 	    	}).then(function(success){
 	    	    tokens.authToken = success.data.access_token;
+		    $sessionStorage.loggedIn = true;
 	    	    $location.path('/manage-projects');
 	    	}, function(error){
 	    	    if (error.status === 400) {

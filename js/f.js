@@ -18,7 +18,7 @@ app.controller('ProjectController', function($scope, envService, googleService, 
     	    $scope.crudHeader = $localStorage.userCalId;	
     	    $scope.showCrudFields = true;
     	    $scope.refreshEvents();
-	} else if (response === 'cal' && !$scope.events && $sessionStorage.authToken && !$sessionStorage.oldToken && $localStorage.userCalId) {
+	} else if (response === 'cal' && !$scope.events && $sessionStorage.authToken && !$sessionStorage.oldToken && $sessionStorage.loggedIn) {
 	    $sessionStorage.oldToken = $sessionStorage.authToken;
 	    delete $sessionStorage.authToken;
 	    setTimeout(function(){
@@ -121,6 +121,8 @@ app.controller('ProjectController', function($scope, envService, googleService, 
     $scope.logOut = function() {
 	delete $localStorage.userCalId;
 	delete $sessionStorage.authToken;
+	delete $sessionStorage.loggedIn;
+	delete $sessionStorage.projects;
 	$location.path('/');
     };
 
