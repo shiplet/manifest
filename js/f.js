@@ -18,7 +18,7 @@ app.controller('ProjectController', function($scope, envService, googleService, 
     	    $scope.crudHeader = $localStorage.userCalId;	
     	    $scope.showCrudFields = true;
     	    $scope.refreshEvents();
-	} else if (response === 'cal' && !$scope.events && $sessionStorage.authToken && !$sessionStorage.oldToken) {
+	} else if (response === 'cal' && !$scope.events && $sessionStorage.authToken && !$sessionStorage.oldToken && $localStorage.userCalId) {
 	    $sessionStorage.oldToken = $sessionStorage.authToken;
 	    delete $sessionStorage.authToken;
 	    setTimeout(function(){
