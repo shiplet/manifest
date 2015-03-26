@@ -126,10 +126,11 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 			});
 			deferred.resolve(x);
 		    }, function(error){
-			deferred.reject(error);
-			console.log(error);
-		    });		   
-		});
+			if (error.status === 401) {
+			    deferred.resolve(error);
+			}
+		     });		   
+		 });
 		return deferred.promise; 		
 	    },
 	    newEvent: function(event) {

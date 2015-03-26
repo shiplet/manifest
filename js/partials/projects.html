@@ -21,7 +21,8 @@
 	  <h3>ID: {{crudHeader}}</h3>
 	</div>
 	<div class="panel-body">
-	  <select class="form-control small-bottom-bump" ng-model="newEvent.project">
+	  <label for="projectFilter">Filter Projects By:</label>
+	  <select id="projectFilter" class="form-control small-bottom-bump" ng-model="newEvent.project">
 	      <option value="" selected>All Projects</option>
 	      <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
 	    </select>
@@ -63,9 +64,18 @@
 	    </div>
 	    <hr>
 	  </form>
-	  <form name="makeInvoiceForm" ng-show="showInvoiceFields">
+	  <form name="makeInvoiceForm" ng-show="showInvoiceFields" novalidate>
+	    <div class="row">
+	      <div class="col-md-6">
+		<label for="invoiceProject">Invoice Project:</label>
+		<select id="invoiceProject" class="form-control small-bottom-bump" ng-model="newInvoice.project" required>
+		  <option value="" selected>All Projects</option>
+		  <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
+		</select>
+	      </div>
+	    </div>
 	    <div class="flex">
-	      <div class="button-bump">
+	      <div class="button-bump">		
 		<label for="invoiceStartDate">Start Date</label>
 		<input id="invoiceStartDate" type="date" class="form-control" placeholder="mm/dd/yyyy" ng-model="newInvoice.startDate" required>
 	      </div>
@@ -74,11 +84,19 @@
 		<input id="invoiceEndDate" type="date" class="form-control" placeholder="mm/dd/yyyy" ng-model="newInvoice.endDate" required>
 	      </div>
 	    </div>
+	    <div class="row">
+	      <div class="col-md-6">
+		<button class="btn btn-info centered small-top-bump" ng-click="submitNewInvoice()" ng-disabled="makeInvoiceForm.$invalid">Submit</button>
+	      </div>
+	      <div class="col-md-6">
+		<button class="btn btn-cancel centered small-top-bump" ng-click="displayInvoice()">Cancel</button>
+	      </div>
+	    </div>
 	  </form>
 	</div>
       </div>
     </div>
-    
+
    
     <div class="col-md-6">
       <div class="panel panel-info" ng-show="showCrudFields">

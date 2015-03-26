@@ -37,27 +37,29 @@ app.controller('ProjectController', function($scope, envService, googleService, 
     $scope.showInvoiceFields = false;
     var eventId;
 
-    if (!$sessionStorage.projects && !$sessionStorage.authToken) {
-	$location.path('/');
-	console.warn('No project data');
-    } else {
-	googleService.authenticate.load().then(function(response){
-    	    if (response === 'auth') {
-    		$scope.showIdInput = false;
-    		$scope.crudHeader = $localStorage.userCalId;	
-    		$scope.showCrudFields = true;
-    		googleService.request.calEvents($localStorage.userCalId)
-    		    .then(function(response){		   
-    			$scope.events = response;
-    			$scope.parseProjects(response);
-    		    });
-    	    }
-	});		
-    }
+    googleService.authenticate.load().then(function(response){
+    	if (response === 'auth' && !$scope.events) {
+    	    $scope.showIdInput = false;
+    	    $scope.crudHeader = $localStorage.userCalId;	
+    	    $scope.showCrudFields = true;
+    	    googleService.request.calEvents($localStorage.userCalId)
+    		.then(function(response){		   
+    		    $scope.events = response;
+    		    $scope.parseProjects(response);
+    		});
+    	} // else if (response === 'auth' && !$scope.events){
+    // 	    googleService.request.calEvents($localStorage.userCalId).then(function(response){
+    // 		if (response.status === 401) {
+    // 		    alert('Your session has timed out');
+    // 		}
+    // 	    });
+    // 	}
+     });    
+
   
 
     $scope.requestEvents = function() {
-	googleService.request.calEvents($scope.user.calendarId).then(function(response){
+	return googleService.request.calEvents($scope.user.calendarId).then(function(response){
 	    $scope.crudHeader = $scope.user.calendarId;
 	    $scope.showIdInput = false;
 	    $scope.showCrudFields = true;
@@ -104,6 +106,10 @@ app.controller('ProjectController', function($scope, envService, googleService, 
 
     $scope.updateEvent = function(event) {
 	!event.isUpdating ? event.isUpdating = true : event.isUpdating = false;
+    };
+
+    $scope.submitNewInvoice = function() {
+	envService.getInvoice($scope.newInvoice, $scope.events);
     };
 
     $scope.exit = function() {
