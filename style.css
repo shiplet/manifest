@@ -64,6 +64,10 @@ html, body {
     outline: 1px solid black;
 }
 
+.btn {
+    background-color: rgb(192, 192, 192);
+}
+
 .btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus {
   outline: none;
   outline: none;
