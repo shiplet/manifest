@@ -1,6 +1,6 @@
 var app = angular.module('manifest');
 
-app.controller('ProjectController', function($scope, envService, googleService, $location, $sessionStorage, $localStorage, $q, $stateParams, invoiceService) {    
+app.controller('ProjectController', function($rootScope, $scope, envService, googleService, $location, $sessionStorage, $localStorage, $q, $interval, invoiceService) {    
     $scope.showIdInput = true;
     $scope.showCrudFields = false;
     $scope.showOverlay = false;
@@ -9,39 +9,48 @@ app.controller('ProjectController', function($scope, envService, googleService, 
     $scope.showLogFields = false;
     $scope.notUpdating = true;
     $scope.updating = false;
-    $scope.showInvoiceFields = false;    
-    var eventId;
+    $scope.showInvoiceFields = false;
+    $scope.userId = $localStorage.userCalId ? $localStorage.userCalId : null;
+    $scope.companyName = $localStorage.companyName ? $localStorage.companyName : null;
+    $scope.hourlyRate = $localStorage.hourlyRate ? $localStorage.hourlyRate : null;
+    var ref = envService.firebase.auth();
+    var tokens, eventId;
 
-    googleService.authenticate.load().then(function(response){
-	if (response === 'cal' && $sessionStorage.projects) {
-	    $scope.showIdInput = false;
-    	    $scope.crudHeader = $localStorage.userCalId;	
-    	    $scope.showCrudFields = true;
-    	    $scope.refreshEvents();
-	} else if (response === 'cal' && !$scope.events && $sessionStorage.authToken && !$sessionStorage.oldToken && $sessionStorage.loggedIn) {
-	    $sessionStorage.oldToken = $sessionStorage.authToken;
-	    delete $sessionStorage.authToken;
-	    setTimeout(function(){
-		alert('Your session has timed out.');
-		googleService.authenticate.mobile.session();
-	    });
-	} else if (response === 'cal' && !$scope.events && $sessionStorage.authToken && $sessionStorage.oldToken) {
-	    delete $sessionStorage.oldToken;
-	    $scope.requestEvents($localStorage.userCalId);
-	}
-    });    
+    var loadCalScreen = function(data) {
+	$localStorage.companyName = $scope.user.companyName;
+	$localStorage.hourlyRate = $scope.user.hourlyRate;
+	$scope.crudHeader = $scope.user.companyName;
+	$scope.showIdInput = false;
+	$scope.showCrudFields = true;	
+	$scope.events = data;
+	$scope.parseProjects(data);
+    };
     
-    
+    $rootScope.$watch('userId', function(newValue, oldValue){
+	$localStorage.userCalId = newValue;
+	if (newValue) {
+	    ref.onAuth(function(authData){
+		if (authData) {
+		    tokens = envService.firebase.tokens(authData.uid);
+		    tokens.$loaded().then(function(){
+			googleService.authenticate.request(tokens.access, tokens.refresh, newValue, authData.uid).then(function(res, newToken){
+			    if (newToken) {
+				googleService.authenticate.request(newToken, null, $localStorage.userCalId, authData.uid).then(function(secondRes){
+				    loadCalScreen(secondRes);
+				});
+			    } else {
+				loadCalScreen(res);
+			    }			    
+			});		    
+		    });
+		}				
+	    });	    
+	};
+    });
     
     $scope.requestEvents = function(id) {
 	id = id || $scope.user.calendarId;
-	return googleService.request.calEvents(id).then(function(response){
-	    $scope.crudHeader = id;
-	    $scope.showIdInput = false;
-	    $scope.showCrudFields = true;
-	    $scope.events = response;
-	    $scope.parseProjects(response);
-	});
+	$rootScope.userId = id;
     };
 
     $scope.refreshEvents = function(id) {
@@ -118,14 +127,12 @@ app.controller('ProjectController', function($scope, envService, googleService, 
 	$scope.notUpdating = true;
     };
 
-    $scope.logOut = function() {
+    $scope.logOut = function() {	
 	delete $localStorage.userCalId;
 	delete $sessionStorage.authToken;
 	delete $sessionStorage.loggedIn;
 	delete $sessionStorage.projects;
-	if ($sessionStorage.oldToken) {
-	    delete $sessionStorage.oldToken;
-	}
+	ref.unauth();
 	$location.path('/');
     };
 
@@ -139,5 +146,5 @@ app.controller('ProjectController', function($scope, envService, googleService, 
 
     $scope.displayInvoice = function() {
 	!$scope.showInvoiceFields ? $scope.showInvoiceFields = true : $scope.showInvoiceFields = false;
-    }
+    };
 });

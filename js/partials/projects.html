@@ -6,10 +6,15 @@
   <div class="row">
     <div class="col-md-6">
       <div class="panel panel-success" ng-show="showIdInput">
-	<div class="panel-heading">Enter Your Calendar Id</div>
+	<div class="panel-heading">Enter Some Basic Information</div>
 	<div class="panel-body">
 	  <form role="form" name="idFields">
-	    <input type="email" class="form-control" ng-model="user.calendarId" placeholder="Email address tied to your calendar" autofocus required>
+	    <label for="calId">Billable Calendar</label>
+	    <input id="calId" type="email" class="form-control small-bottom-bump" ng-model="user.calendarId" placeholder="Email address tied to your billing calendar" ng-init="user.calendarId = userId " autofocus required>
+	    <label for="companyName">Company Name</label>
+	    <input id="companyName" type="text" class="form-control small-bottom-bump" ng-model="user.companyName" placeholder="Your name or company name" ng-init="user.companyName = companyName" required>
+	    <label for="hourlyRate">Hourly Rate</label>
+	    <input id="hourlyRate" type="number" class="form-control small-bottom-bump" ng-model="user.hourlyRate" placeholder="Hourly rate" ng-init="user.hourlyRate = hourlyRate" required>
 	    <button class="btn btn-success small-bump" ng-click="requestEvents()" ng-disabled="idFields.$invalid">Submit</button>
 	  </form>
 	</div>
@@ -26,8 +31,13 @@
 	      <option value="" selected>All Projects</option>
 	      <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
 	    </select>
-	  <button class="btn btn-info btn-lg small-bottom-bump" ng-click="displayLog()">Log Time</button>
-	  <button class="btn btn-info btn-lg small-bottom-bump" ng-click="displayInvoice()">Create Invoice</button>
+	  <button class="btn btn-info small-bottom-bump" ng-click="displayLog()">Log Time</button>
+	  <button class="btn btn-info small-bottom-bump" ng-click="displayInvoice()">Create Invoice</button>
+	  <button class="btn btn-info small-bottom-bump" ng-click="changeCompany()">Change Company</button>
+	  <button class="btn btn-info small-bottom-bump" ng-click="changeHourly()">Change Hourly Rate</button>
+	  <form name="changeCompany">
+	    <input class="form-control small-bottom-bump" placeholder="New Company Name" ng-model="user.companyName">
+	  </form>
 	  <form name="newEventLog" ng-show="showLogFields" novalidate>	    
 	    <!-- Project Title Fields -->
 	    <div class="form-group flex">
@@ -86,7 +96,7 @@
 	    </div>
 	    <div class="row">
 	      <div class="col-md-6">
-		<button class="btn btn-info centered small-top-bump" ng-click="submitNewInvoice()" ng-disabled="makeInvoiceForm.$invalid">Submit</button>
+		<button class="btn btn-info centered small-top-bump" ng-click="submitNewInvoice()" ng-disabled="makeInvoiceForm.$invalid">Create New Invoice</button>
 	      </div>
 	      <div class="col-md-6">
 		<button class="btn btn-cancel centered small-top-bump" ng-click="displayInvoice()">Cancel</button>
@@ -148,38 +158,38 @@
       </div>
     </div>
   </div>
+</div>
   
-  <div class="overlay" ng-show="showOverlay" ng-click="cancel()">
-    <div class="row">
-      <div class="logOut-popup centered" ng-show="logOutPop">
-	<div class="col-md-3">
-	  <div class="panel panel-info">
-	    <div class="panel-heading centered"><h3>Log out?</h3></div>
-	    <div class="panel-body">
-	      <div class="row">
-		<div class="col-md-6">
-		  <button class="btn btn-danger popup-btn" ng-click="logOut()">Yes</button>
-		</div>
-		<div class="col-md-6">
-		  <button class="btn btn-cancel popup-btn" ng-click="cancel()">Cancel</button>
-		</div>
+<div class="overlay" ng-show="showOverlay" ng-click="cancel()">
+  <div class="row">
+    <div class="logOut-popup centered" ng-show="logOutPop">
+      <div class="col-md-3">
+	<div class="panel panel-info">
+	  <div class="panel-heading centered"><h3>Log out?</h3></div>
+	  <div class="panel-body">
+	    <div class="row">
+	      <div class="col-md-6">
+		<button class="btn btn-danger popup-btn" ng-click="logOut()">Yes</button>
+	      </div>
+	      <div class="col-md-6">
+		<button class="btn btn-cancel popup-btn" ng-click="cancel()">Cancel</button>
 	      </div>
 	    </div>
 	  </div>
 	</div>
       </div>
-      <div class="logOut-popup" ng-show="deletePop">
-	<div class="col-md-3">
-	  <div class="panel panel-info">
-	    <div class="panel-heading centered"><h3>Are you sure?</h3></div>
-	    <div class="panel-footer">
-	      <div class="row">
-		<div class="col-md-6">
-		  <button class="btn btn-danger popup-btn" ng-click="deleteEvent()">Yes</button>
-		</div>
-		<div class="col-md-6">
-		  <button class="btn btn-cancel popup-btn" ng-click="cancel()">Cancel</button>
-		</div>
+    </div>
+    <div class="logOut-popup" ng-show="deletePop">
+      <div class="col-md-3">
+	<div class="panel panel-info">
+	  <div class="panel-heading centered"><h3>Are you sure?</h3></div>
+	  <div class="panel-footer">
+	    <div class="row">
+	      <div class="col-md-6">
+		<button class="btn btn-danger popup-btn" ng-click="deleteEvent()">Yes</button>
+	      </div>
+	      <div class="col-md-6">
+		<button class="btn btn-cancel popup-btn" ng-click="cancel()">Cancel</button>
 	      </div>
 	    </div>
 	  </div>
@@ -187,3 +197,4 @@
       </div>
     </div>
   </div>
+</div>

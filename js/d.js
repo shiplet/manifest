@@ -3,97 +3,119 @@ var app = angular.module('manifest');
 app.service('googleService', function(envService, $timeout, $location, $http, $q, $window, $localStorage, $sessionStorage){
     var accessCode, authToken;
 
-    var tokens = $sessionStorage.$default();
-
-    var getToken = function(token) {
-	if (token === $location.absUrl()) {
-	    console.warn('Not authenticated');
-	} else {
-	    envService.getEnv().then(function(x){
-		var deferred = $q.defer();		
-		$http({
-	    	    method: 'POST',
-	    	    url: x.b+'code='+token+'&client_id='+x.d+'&client_secret='+x.g+'&redirect_uri='+x.e+'&grant_type=authorization_code'
-	    	}).then(function(success){
-	    	    tokens.authToken = success.data.access_token;
-		    $sessionStorage.loggedIn = true;
-	    	    $location.path('/manage-projects');
-	    	}, function(error){
-	    	    if (error.status === 400) {
-	    		console.error('This session has not authenticated yet.');
-	    	    }
-	    	});
-	    	return deferred.promise;		
-	    });	  
-	}
+    var getTokens = function(code, uid) {
+	var deferred = $q.defer();		
+	envService.firebase.oauth().$loaded().then(function(x){
+	    $http({
+	    	method: 'POST',
+	    	url: x.b+'code='+code+'&client_id='+x.d+'&client_secret='+x.g+'&redirect_uri='+x.e+'&grant_type=authorization_code'
+	    }).then(function(success){
+		var tokens =  envService.firebase.tokens(uid);		  
+		tokens.access = success.data.access_token;
+		tokens.refresh = success.data.refresh_token;		  
+		tokens.$save().then(function(res){
+		    deferred.resolve(res);
+		});
+	    }, function(error){
+		console.log(error);
+	    });
+	});	  
+	return deferred.promise;		
     };
     
     return {
-	authenticate: {
-	    mobile: {
-		session: function() {
-		    envService.getEnv().then(function(x){
-			var authUrl = x.a+'scope='+x.f+'&redirect_uri='+x.e+'&response_type='+x.c+'&client_id='+x.d;
-			window.location.assign(authUrl);
-		    });		    		    
-		},
-		token: function() {		    
-		    var url = $location.absUrl(),
-			start = url.indexOf('=') + 1,
-			end, token;
-		    if (url.indexOf('#') !== -1) {
-			end = url.indexOf('#');
-			token = url.slice(start, end);
-		    } else {
-			token = url.slice(start);
-		    }
-		    $location.search('code', null);
-		    getToken(token);
-		}
+	authenticate: {	   
+	    session: function(x) {		    
+		var authUrl = x.a+'scope='+x.f+'&redirect_uri='+x.e+'&response_type='+x.c+'&client_id='+x.d+'&access_type=offline';
+		window.location.assign(authUrl);
 	    },
-	    load: function() {
-		var holdForAuth = $q.defer();
-		if (!$localStorage.userCalId) {
-		    holdForAuth.resolve('No user calendars specified');
-		} else {		    
-		    holdForAuth.resolve('cal');
-		}
-		return holdForAuth.promise;
+	    token: function(code, uid) {		    
+		$location.search('code', null);		
+		return getTokens(code, uid);
 	    },
-	    session: function() {
-		var holdForAuth = $q.defer();
-		var top = (screen.height / 2) - 200;
-		var left = (screen.width / 2) - 300;
-		var win = window.open(authUrl, 'AuthWindow', 'width=600, height=400, top='+top+', left='+left);
-		var pollTimer = setInterval(function(){
-		    try {
-			if (win.document.URL) {
-			    window.clearInterval(pollTimer);
-			    var url = win.document.URL,
-				start = url.indexOf('=') + 1,
-				end, token;
-			    if (url.indexOf('#') !== -1) {
-				end = url.indexOf('#');
-				token = url.slice(start, end);
-			    } else {
-				token = url.slice(start);
-			    }				
-			    getToken(token);
-			    win.close();
+	    request: function(access, refresh, calId, uid) {
+		// Set promise //
+		var deferred = $q.defer();
+
+		// Get current tokens //
+		var tokens = envService.firebase.tokens(uid);
+
+		// Get current OAuth Environment variables, and on load 
+		// begin API calls
+		envService.firebase.oauth().$loaded().then(function(x){
+		    $http({
+			method: 'GET',
+			url: x.i+'calendars/'+calId+'/events?access_token='+access
+		    }).then(function(requestSuccess){
+
+			// Parse through items and add formatting keys for
+			// $scope controller, resolve when complete
+			var y = requestSuccess.data.items;
+		    	var x = y.filter(function(z){
+		    	    if (z.status !== 'cancelled') {
+		    		return z;
+		    	    }
+		    	});
+		    	x.map(function(y){
+		    	    if (y.status !== 'cancelled'){
+		    		if (y.start.hasOwnProperty('date')){
+		    		    y.start.date = Date.parse(y.start.date);
+		    		    y.date = y.start.date;
+		    		    y.end.date = Date.parse(y.end.date);
+		    		    y.duration = (y.end.date - y.start.date) / 3600000;
+		    		} else if (y.start.hasOwnProperty('dateTime')) {
+		    		    y.start.dateTime = Date.parse(y.start.dateTime);
+		    		    y.date = y.start.dateTime;
+		    		    y.end.dateTime = Date.parse(y.end.dateTime);
+		    		    y.duration = (y.end.dateTime - y.start.dateTime) / 3600000;
+		    		}			    
+		    	    }
+		    	    y.isUpdating = false;
+		    	});
+		    	deferred.resolve(x);		
+		    }, function(requestError){
+
+			// Log error //
+			console.log(requestError);
+
+			// 401 Error, with refresh token calls//
+			if (requestError.status === 401) {
+			    var smallDefer = $q.defer();
+			    console.error('Invalid access token');
+			    $http({
+		    		method: 'POST',
+		    		url: x.b+'client_id='+x.d+'&client_secret='+x.g+'&refresh_token='+refresh+'&grant_type=refresh_token'
+			    }).then(function(refreshSuccess){
+
+				// Set new tokens for auth user //
+		    		tokens.$loaded().then(function(t){
+				    console.log(refreshSuccess.data.access_token);
+				    tokens.access = refreshSuccess.data.access_token;
+				    tokens.$save().then(function(saveSuccess){
+					smallDefer.resolve('success', tokens.access);
+				    }, function(saveError){
+					smallDefer.resolve(saveError);
+				    });
+				});
+			    }, function(refreshError){
+		    		console.log(refreshError);
+			    });
+			    return smallDefer.promise;
 			}
-		    } catch(e){}
-		}, 50);
-		var authTimer = setInterval(function(){
-		    try {
-			if ($sessionStorage.authToken) {
-			    window.clearInterval(authTimer);
-			    holdForAuth.resolve('Session authorized');
+			else if (requestError.status === 404) {
+			    console.error('User ID not yet defined');
+			} else if (requestError.status === 403 && calId) {
+			    console.error('Access token either undefined or expired');
+			} else if (requestError.status === 403 && !calId) {
+			    console.error('Neither User ID nor access token are defined');
 			}
-		    } catch(e){}
-		}, 100);
-		return holdForAuth.promise;
+		    });
+		});
+
+		// Return promise //
+		return deferred.promise;
 	    }
-	},
+	},	        
 	request: {
 	    calEvents: function(id) {
 		var deferred = $q.defer();

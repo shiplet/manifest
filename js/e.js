@@ -3,10 +3,14 @@ var app = angular.module('manifest');
 app.service('invoiceService', function($location, $sessionStorage){
     return {
 	createInvoice: function(i) {
-	    $location.path('/invoicing');
-	    $sessionStorage.invoiceProjects = i;
-	    i.forEach(function(x){
-		console.log(x.summary);
+	    $location.path('/invoice');
+	    $sessionStorage.invoice = {};
+	    $sessionStorage.invoice.project = i.project;
+	    $sessionStorage.invoice.events = i.events;
+	    $sessionStorage.invoice.dateRange = i.dateRange;
+	    $sessionStorage.invoice.totalHours = 0;
+	    i.events.forEach(function(e){
+		$sessionStorage.invoice.totalHours += e.duration;
 	    });
 	}
     };

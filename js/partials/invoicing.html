@@ -1,3 +1,48 @@
-<div ng-repeat="project in projects">
-  <h2>{{project.summary}}</h2>
+<div class="container small-top-bump">
+  <button class="btn btn-info small-bottom-bump back-to-projects" ui-sref="manage-projects">Back to Manage Projects</button>
+  <div class="row">
+    <div class="company-name">
+      <h3>{{companyName}}</h3>
+    </div>
+    <div class="panel invoice-panel">
+      <div class="panel-heading heading-flex bottom-border">
+	<h1>{{project}}</h1><h3>From {{from}} to {{to}}</h3>
+      </div>
+      <div class="panel-body invoice-body">
+	<div ng-repeat="event in events | orderBy:['date']:false">
+	  <div class="heading-flex">
+	    <p><strong>{{event.summary}}</strong></p>
+	    <p>{{event.duration}} hour(s)</p>
+	  </div>
+	  <p>{{event.date | date:'shortDate'}}</p>
+	  <hr>
+	</div>      
+      </div>
+      <div class="invoice-footer">
+	<h1 class="total-header">{{totalHours}} hours @ ${{hourlyRate}}/hour</h1>
+	<h1>{{totalHours * hourlyRate | currency}}</h1>
+      </div>
+    </div>
+  </div>
 </div>
+      
+<div class="overlay" ng-show="showOverlay" ng-click="cancel()">
+  <div class="row">
+    <div class="logOut-popup centered">
+      <div class="col-md-3">
+	<div class="panel panel-info">
+	  <div class="panel-heading centered"><h3>Heads Up</h3></div>
+	  <div class="panel-body invoice-alert">
+	    <h6>You can adjust Page Title and Url (header and footer) settings in your browser print options</h6>
+	  </div>
+	  <div class="panel-footer">	    
+	    <div class="centered">
+	      <div class="btn btn-info popup-btn" ng-click="cancel()">Ok</div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+      

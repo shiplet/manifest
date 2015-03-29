@@ -14,24 +14,25 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider){
 	    templateUrl: './js/partials/projects.html',
 	    controller: 'ProjectController'
 	})
-	.state('invoicing', {
-	    url: '/invoicing',
+	.state('invoice', {
+	    url: '/invoice',
 	    templateUrl: './js/partials/invoicing.html',
 	    controller: 'InvoiceController',
 	    resolve: {
 		getInvoiceProjects: function($sessionStorage){
-		    return $sessionStorage.invoiceProjects;
+		    return $sessionStorage.invoice;
 		}
 	    }
 	});
 });
 
-app.run(function($rootScope, $sessionStorage, $location){
+app.run(function($rootScope, $sessionStorage, $location, envService){
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
-	if (!$sessionStorage.authToken) {
-	    if (toState.url === '/manage-projects' && fromState.url === '/') {
-		event.preventDefault();
+	var ref = envService.firebase.auth();
+	ref.onAuth(function(authData){
+	    if (!authData) {
+		$location.path('/');
 	    }
-	}	
+	});
     });
 });

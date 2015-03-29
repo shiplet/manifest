@@ -2,22 +2,24 @@ var app = angular.module('manifest');
 
 app.service('envService', function($window, $http, $firebaseArray, $firebaseObject, $q){
     return {
-	getEnv: function() {
-	    return $http({
-		method: 'GET',
-		url: 'js/getEnv'
-	    }).then(function(success){
-		return success.data;
-	    }, function(error){
-		return error;
-	    });
+	firebase: {
+	    auth: function() {
+		return new Firebase('https://manifest.firebaseio.com');
+	    },
+	    oauth: function() {
+		return $firebaseObject(new Firebase('htts://manifest.firebaseio.com/env'));
+	    },
+	    users: function() {
+		return $firebaseObject(new Firebase('https://manifest.firebaseio.com/users'));
+	    },
+	    tokens: function(uid) {
+		return $firebaseObject(new Firebase('https://manifest.firebaseio.com/users/'+uid));
+	    }
 	},
 	getInvoice: function(invoice, events) {
 	    var project = invoice.project;
 	    var iStart = invoice.startDate;
 	    var iEnd = moment(invoice.endDate).add(1, 'days');
-	    var start = moment(invoice.startDate).format('MMM Do YYYY, h:mm:ss a');
-	    var end = moment(iEnd).format('MMM Do YYYY, h:mm:ss a');
 	    var edgeCount = 0;
 	    var p = events.filter(function(i){
 	    	var eStart = i.start.dateTime;
@@ -40,7 +42,14 @@ app.service('envService', function($window, $http, $firebaseArray, $firebaseObje
 	    if (edgeCount) {
 		alert('Heads up: you\'re invoicing an event that exceeds your date range.');
 	    }
-	    return p;
+	    return {
+		project: project,
+		dateRange: {
+		    invoiceStart: iStart,
+		    invoiceEnd: iEnd
+		},
+		events: p
+	    };
 	}
     };
 });

@@ -3,6 +3,19 @@ html, body {
     width: 100%;
 }
 
+.login-link {
+    text-align: center;    
+}
+
+.login-link a:hover {
+    cursor: pointer;
+}
+
+.login-btn {
+    display: block;
+    margin: 0 auto;
+}
+
 .bump {
     margin: 25px;
 }
@@ -162,6 +175,90 @@ html, body {
 
 .red {
     color: red;
+}
+
+.back-to-projects {
+    display: block;
+    margin: 0 auto 15px;
+}
+
+.company-name {
+    display: inline-block;
+    padding: 25px;
+    position: relative;
+}
+
+.company-name h3 {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+.heading-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    display: -webkit-flex;
+    -webkit-align-items: center;
+    -webkit-justify-content: space-between;
+}
+
+.bottom-border {
+    border-bottom: 3px solid black;
+}
+
+.invoice-panel {
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.invoice-body {
+    border-bottom: 3px solid black;
+}
+
+.invoice-body hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.invoice-footer {
+    text-align: right;
+}
+
+.invoice-alert {
+    text-align: center;
+}
+
+.total-header {
+    display: inline-block;
+    border-bottom: 3px solid black;
+}
+
+@media print {
+
+    .html, body {
+	width: 1000px;
+	height: 1294px;
+    }
+    
+    .back-to-projects {
+	display: none;
+    }
+    
+    .outline {
+	outline: none;
+    }
+    
+    .invoice-body p {
+	font-size: 1rem;
+	margin: 0;
+    }
+
+    .invoice-body hr {
+	margin: 1px;
+    }
 }
 
 @media all and (max-width: 991px) {
