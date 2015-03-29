@@ -35,9 +35,11 @@
 	  <button class="btn btn-info small-bottom-bump" ng-click="displayInvoice()">Create Invoice</button>
 	  <button class="btn btn-info small-bottom-bump" ng-click="changeCompany()">Change Company</button>
 	  <button class="btn btn-info small-bottom-bump" ng-click="changeHourly()">Change Hourly Rate</button>
-	  <form name="changeCompany">
-	    <input class="form-control small-bottom-bump" placeholder="New Company Name" ng-model="user.companyName">
-	  </form>
+	  <div ng-show="showChangeCompany">
+	    <form name="changeCompany">
+	      <input class="form-control small-bottom-bump" placeholder="New Company Name" ng-model="user.companyName">
+	    </form>
+	  </div>
 	  <form name="newEventLog" ng-show="showLogFields" novalidate>	    
 	    <!-- Project Title Fields -->
 	    <div class="form-group flex">

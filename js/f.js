@@ -10,11 +10,16 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     $scope.notUpdating = true;
     $scope.updating = false;
     $scope.showInvoiceFields = false;
+    $scope.showChangeCompany = false;
     $scope.userId = $localStorage.userCalId ? $localStorage.userCalId : null;
     $scope.companyName = $localStorage.companyName ? $localStorage.companyName : null;
     $scope.hourlyRate = $localStorage.hourlyRate ? $localStorage.hourlyRate : null;
+    $rootScope.userId = $localStorage.userCalId || null;
     var ref = envService.firebase.auth();
-    var tokens, eventId;
+    var userAuthData = ref.getAuth(),
+	tokens = envService.firebase.tokens(userAuthData.uid),
+	eventId;
+	
 
     var loadCalScreen = function(data) {
 	$localStorage.companyName = $scope.user.companyName;
@@ -27,18 +32,25 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     };
     
     $rootScope.$watch('userId', function(newValue, oldValue){
-	$localStorage.userCalId = newValue;
+	console.log('Old value: ', oldValue);
+	console.log('New value: ', newValue);
+	$localStorage.userCalId = newValue;	
 	if (newValue) {
+	    console.log('Making ref.auth check');
 	    ref.onAuth(function(authData){
 		if (authData) {
-		    tokens = envService.firebase.tokens(authData.uid);
+		    console.log('User auth successful');		    
 		    tokens.$loaded().then(function(){
 			googleService.authenticate.request(tokens.access, tokens.refresh, newValue, authData.uid).then(function(res, newToken){
 			    if (newToken) {
+				console.log('Requesting new access token');
 				googleService.authenticate.request(newToken, null, $localStorage.userCalId, authData.uid).then(function(secondRes){
+				    console.log('New access token saved, now loading calendar view');
 				    loadCalScreen(secondRes);
 				});
 			    } else {
+				console.log('Loading calendar view');
+				console.log('Current calendar id: ', $localStorage.userCalId);
 				loadCalScreen(res);
 			    }			    
 			});		    
@@ -50,14 +62,13 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     
     $scope.requestEvents = function(id) {
 	id = id || $scope.user.calendarId;
-	$rootScope.userId = id;
+	$rootScope.userId = id || $localStorage.userCalId;
     };
 
     $scope.refreshEvents = function(id) {
 	id = id || $localStorage.userCalId;
-	googleService.request.calEvents(id).then(function(response){
-	    $scope.events = response;
-	    $scope.parseProjects(response);
+	googleService.authenticate.request(tokens.access, tokens.refresh, $localStorage.userCalId, userAuthData.uid).then(function(res){ 
+	    loadCalScreen(res);
 	});
     };
 
@@ -78,14 +89,14 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     };
 
     $scope.submitNewEvent = function() {
-	googleService.request.newEvent($scope.newEvent).then(function(response){
-	    $scope.newEvent = {};
+	googleService.request.newEvent($scope.newEvent, userAuthData.uid).then(function(response){
+	    console.log($scope.newEvent);
 	    $scope.refreshEvents();
 	});
     };
 
     $scope.submitUpdate = function(event) {
-	googleService.request.updateEvent(event).then(function(){
+	googleService.request.updateEvent(event, userAuthData.uid).then(function(){
 	    $scope.refreshEvents();
 	});
     };
@@ -111,7 +122,7 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     };
 
     $scope.deleteEvent = function() {
-	googleService.request.deleteEvent(eventId).then(function(response){
+	googleService.request.deleteEvent(eventId, userAuthData.uid).then(function(response){
 	    $scope.refreshEvents();
 	});
     };

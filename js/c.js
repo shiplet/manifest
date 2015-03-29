@@ -5,25 +5,36 @@ app.controller('MainController', function($scope, envService, googleService, $lo
     $scope.showLoginFields = false;
     var ref = envService.firebase.auth();
     var envData = envService.firebase.oauth();
-    var tokens = envService.firebase.tokens();
 
     ref.onAuth(function(authData){
 	if (authData) {
 	    console.log('Auth on load: ', authData.uid);
-	    if (!$location.search().code && !$sessionStorage.loggedIn){
-		$sessionStorage.loggedIn = authData.uid;
-		envData.$loaded().then(function(data){
-		    console.log('Data loaded, transferring to Google');
-		    googleService.authenticate.session(data);
-		});
-	    } else if ($location.search().code) {
-		console.log('Code received, retrieving access tokens');
-		googleService.authenticate.token($location.search().code, authData.uid).then(function(state, res){
-		    if (state) {
+	    envService.firebase.tokens(authData.uid).$loaded().then(function(t){
+		if (t) {
+		    console.log('Returned token data for: ', t.$id);
+		    if (t.access && t.refresh) {
+			console.log('Tokens already exist, routing to /manage-projects');
 			$location.path('/manage-projects');
+		    } else {
+			console.log('No tokens exist');
+			if (!$location.search().code && !$sessionStorage.loggedIn){
+			    console.log('No url parameters');
+			    $sessionStorage.loggedIn = authData.uid;
+			    envData.$loaded().then(function(data){
+				console.log('Data loaded, transferring to Google');
+				googleService.authenticate.session(data);
+			    });
+			} else if ($location.search().code) {
+			    console.log('Code received, retrieving access tokens');
+			    googleService.authenticate.token($location.search().code, authData.uid).then(function(state, res){
+				if (state) {
+				    $location.path('/manage-projects');
+				}
+			    });
+			};
 		    }
-		});
-	    } 
+		} ;
+	    });
 	} else {
 	    $scope.showCreateUserFields = true;
 	    $scope.showLoginFields = false;	    
@@ -56,7 +67,7 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 	    if (error) {
 		console.log('Login failed: ', error);
 	    } else {
-		console.log('Login succeeded: ', authData);
+		console.log('Login succeeded: ', authData.provider);
 	    }
 	});
     };    
