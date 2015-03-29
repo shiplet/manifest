@@ -17,7 +17,7 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 			$location.path('/manage-projects');
 		    } else {
 			console.log('No tokens exist');
-			if (!$location.search().code && !$sessionStorage.loggedIn){
+			if (!$location.search().code && (!$sessionStorage.loggedIn || $sessionStorage.loggedIn)){
 			    console.log('No url parameters');
 			    $sessionStorage.loggedIn = authData.uid;
 			    envData.$loaded().then(function(data){
@@ -31,9 +31,9 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 				    $location.path('/manage-projects');
 				}
 			    });
-			};
+			}
 		    }
-		} ;
+		};
 	    });
 	} else {
 	    $scope.showCreateUserFields = true;
