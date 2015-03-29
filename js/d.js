@@ -6,18 +6,21 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
     var getTokens = function(code, uid) {
 	var deferred = $q.defer();		
 	envService.firebase.oauth().$loaded().then(function(x){
+	    console.log('Making http request');
 	    $http({
 	    	method: 'POST',
 	    	url: x.b+'code='+code+'&client_id='+x.d+'&client_secret='+x.g+'&redirect_uri='+x.e+'&grant_type=authorization_code'
 	    }).then(function(success){
+		console.log('Successful API call, now saving tokens');
 		var tokens =  envService.firebase.tokens(uid);		  
 		tokens.access = success.data.access_token;
 		tokens.refresh = success.data.refresh_token;		  
 		tokens.$save().then(function(res){
-		    deferred.resolve(res);
+		    deferred.resolve('Success', res);
 		});
 	    }, function(error){
-		console.log(error);
+		console.error('Error while saving tokens: ', error);
+		deferred.resolve(null, error);
 	    });
 	});	  
 	return deferred.promise;		
@@ -30,8 +33,11 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 		window.location.assign(authUrl);
 	    },
 	    token: function(code, uid) {		    
+		var deferred = $q.defer();
+		console.log('Successful code parse');
 		$location.search('code', null);		
-		return getTokens(code, uid);
+		deferred.resolve(getTokens(code, uid));
+		return deferred.promise;
 	    },
 	    request: function(access, refresh, calId, uid) {
 		// Set promise //

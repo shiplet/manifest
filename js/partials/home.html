@@ -2,23 +2,27 @@
   <div class="logo">
     <img src="assets/logo_dark.svg"/>
 
-    <form name="createNewUser" ng-show="showCreateUserFields">
-      <input type="email" class="form-control small-top-bump small-bottom-bump" ng-model="newUser.email" placeholder="Enter Email Address" required>
-      <input type="password" class="form-control" ng-model="newUser.password" placeholder="Enter Password" required>
-      <button class="btn btn-success login-btn small-top-bump small-bottom-bump" ng-click="createUser()" ng-disabled="createNewUser.$invalid">Create Account</button>
-      <div class="login-link">
-	<a ng-click="showLogin()">Log In</a>
-      </div>
-    </form>
+    <div ng-show="showCreateUserFields">
+      <form name="createNewUser">
+	<input type="email" class="form-control small-top-bump small-bottom-bump" ng-model="newUser.email" placeholder="Enter Email Address" required>
+	<input type="password" class="form-control" ng-model="newUser.password" placeholder="Enter Password" required>
+	<button class="btn btn-success login-btn small-top-bump small-bottom-bump" ng-click="createUser()" ng-disabled="createNewUser.$invalid">Create Account</button>
+	<div class="login-link">
+	  <a ng-click="showLogin()">Log In</a>
+	</div>
+      </form>
+    </div>      
 
-    <form name="loginForm" ng-show="showLoginFields">
-      <input type="email" class="form-control small-top-bump small-bottom-bump" ng-model="login.email" placeholder="User Email" required autofocus>
-      <input type="password" class="form-control" ng-model="login.password" placeholder="User Password" required>
-      <button class="btn btn-primary login-btn small-top-bump small-bottom-bump" ng-click="login()" ng-disabled="loginForm.$invalid">Log In</button>
-      <div class="login-link">
-	<a ng-click="showLogin()">Create User</a>
-      </div>
-    </form>
+    <div ng-show="showLoginFields">
+      <form name="loginForm">
+	<input type="email" class="form-control small-top-bump small-bottom-bump" ng-model="login.email" placeholder="User Email" required autofocus>
+	<input type="password" class="form-control" ng-model="login.password" placeholder="User Password" required>
+	<button class="btn btn-primary login-btn small-top-bump small-bottom-bump" ng-click="login()" ng-disabled="loginForm.$invalid">Log In</button>
+	<div class="login-link">
+	  <a ng-click="showLogin()">Create User</a>
+	</div>
+      </form>
+    </div>
 
     <button class="btn btn-danger login-btn small-top-bump" ng-click="unauth()">Log Out</button>
     </div>

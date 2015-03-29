@@ -2,24 +2,28 @@ var app = angular.module('manifest');
 
 app.controller('MainController', function($scope, envService, googleService, $location, $sessionStorage, $state, $firebaseObject){
     $scope.showCreateUserFields = true;
+    $scope.showLoginFields = false;
     var ref = envService.firebase.auth();
-    ref.onAuth(function(authData){	
-	if (authData) {	   
-	    var tokens = envService.firebase.tokens(authData.uid);
-	    tokens.$loaded().then(function(){		
-		if (!tokens.access && !tokens.refresh && !$sessionStorage.loggedIn) {    
-		    $sessionStorage.loggedIn = authData.uid;
-		    envService.firebase.oauth().$loaded().then(function(envData){
-		    	googleService.authenticate.session(envData);
-		    });
-		} else if (!tokens.access && !tokens.refresh && $sessionStorage.loggedIn) {
-		    if ($location.search().code) {
-			googleService.authenticate.token($location.search().code, authData.uid);
+    var envData = envService.firebase.oauth();
+    var tokens = envService.firebase.tokens();
+
+    ref.onAuth(function(authData){
+	if (authData) {
+	    console.log('Auth on load: ', authData.uid);
+	    if (!$location.search().code && !$sessionStorage.loggedIn){
+		$sessionStorage.loggedIn = authData.uid;
+		envData.$loaded().then(function(data){
+		    console.log('Data loaded, transferring to Google');
+		    googleService.authenticate.session(data);
+		});
+	    } else if ($location.search().code) {
+		console.log('Code received, retrieving access tokens');
+		googleService.authenticate.token($location.search().code, authData.uid).then(function(state, res){
+		    if (state) {
+			$location.path('/manage-projects');
 		    }
-		} else if (tokens.access && tokens.refresh && $sessionStorage.loggedIn) {
-		    $location.path('/manage-projects');
-		}
-	    });	    
+		});
+	    } 
 	} else {
 	    $scope.showCreateUserFields = true;
 	    $scope.showLoginFields = false;	    
@@ -28,6 +32,10 @@ app.controller('MainController', function($scope, envService, googleService, $lo
     });
 
     $scope.createUser = function() {
+	console.log('Hiding create user fields');
+	$scope.showCreateUserFields = false;
+	console.log('Showing login fields');
+	$scope.showLoginFields = true;
 	ref.createUser({
 	    email: $scope.newUser.email,
 	    password: $scope.newUser.password
@@ -35,9 +43,7 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 	    if (error) {
 		console.log('Error creating user: ', error);
 	    } else {
-		alert('You may now log in');
-		$scope.showCreateUserFields = false;
-		$scope.showLoginFields = true;
+		console.log('Successful user creation: ', userData);		
 	    }
 	});
     };
@@ -49,7 +55,9 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 	}, function(error, authData){
 	    if (error) {
 		console.log('Login failed: ', error);
-	    } 
+	    } else {
+		console.log('Login succeeded: ', authData);
+	    }
 	});
     };    
 
@@ -61,6 +69,9 @@ app.controller('MainController', function($scope, envService, googleService, $lo
     $scope.unauth = function() {
 	delete $sessionStorage.loggedIn;
 	ref.unauth();
+	setTimeout(function(){
+	    window.location.reload(true);
+	}, 100);
     };  
 });
 
