@@ -43,11 +43,7 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
 		    tokens.$loaded().then(function(){
 			googleService.authenticate.request(tokens.access, tokens.refresh, newValue, authData.uid).then(function(res, newToken){
 			    if (newToken) {
-				console.log('Requesting new access token');
-				googleService.authenticate.request(newToken, null, $localStorage.userCalId, authData.uid).then(function(secondRes){
-				    console.log('New access token saved, now loading calendar view');
-				    loadCalScreen(secondRes);
-				});
+				console.log(res, newToken);
 			    } else {
 				console.log('Loading calendar view');
 				console.log('Current calendar id: ', $localStorage.userCalId);
@@ -91,6 +87,7 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     $scope.submitNewEvent = function() {
 	googleService.request.newEvent($scope.newEvent, userAuthData.uid).then(function(response){
 	    console.log($scope.newEvent);
+	    $scope.newEvent = {};
 	    $scope.refreshEvents();
 	});
     };
@@ -148,14 +145,42 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     };
 
     $scope.displayLog = function() {
-	if (!$scope.showLogFields) {
-	    $scope.showLogFields = true;
-	} else if ($scope.showLogFields) {
-	    $scope.showLogFields = false;
-	}
+	!$scope.showLogFields ? $scope.showLogFields = true : $scope.showLogFields = false;
+	$scope.showInvoiceFields = false;
+	$scope.showChangeCompany = false;
+	$scope.showChangeHourly = false;
     };
 
     $scope.displayInvoice = function() {
 	!$scope.showInvoiceFields ? $scope.showInvoiceFields = true : $scope.showInvoiceFields = false;
+	$scope.showLogFields = false;
+	$scope.showChangeCompany = false;
+	$scope.showChangeHourly = false;	
+    };
+
+    $scope.displayChangeCompany = function() {
+	!$scope.showChangeCompany ? $scope.showChangeCompany = true : $scope.showChangeCompany = false;
+	$scope.showLogFields = false;
+	$scope.showInvoiceFields = false;
+	$scope.showChangeHourly = false;
+    };
+
+    $scope.displayChangeHourly = function() {
+	!$scope.showChangeHourly ? $scope.showChangeHourly = true : $scope.showChangeHourly = false;
+
+	$scope.showLogFields = false;
+	$scope.showInvoiceFields = false;
+	$scope.showChangeCompany = false;
+    };
+
+    $scope.updateCompany = function() {
+	$localStorage.companyName = $scope.user.companyName;
+	$scope.crudHeader = $localStorage.companyName;
+	$scope.displayChangeCompany();
+    };
+
+    $scope.updateHourly = function() {
+	$localStorage.hourlyRate = $scope.user.hourlyRate;
+	$scope.displayChangeHourly();
     };
 });

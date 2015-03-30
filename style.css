@@ -186,6 +186,7 @@ html, body {
     display: inline-block;
     padding: 25px;
     position: relative;
+    width: 100%;
 }
 
 .company-name h3 {

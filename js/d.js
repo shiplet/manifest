@@ -16,7 +16,7 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 		    $location.path('/');
 		} else {
 		    tokens.access = success.data.access_token;
-		    tokens.refresh = success.data.refresh_token;		  
+		    tokens.refresh = success.data.refresh_token;
 		    tokens.$save().then(function(res){
 			deferred.resolve('Success', res);
 		    });
@@ -89,21 +89,21 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 			
 			// 401 Error, with refresh token calls//
 			if (requestError.status === 401) {
-			    var smallDefer = $q.defer();
 			    console.error('Invalid access token');
-			    $http({
+			    return $http({
 		    		method: 'POST',
 		    		url: x.b+'client_id='+x.d+'&client_secret='+x.g+'&refresh_token='+refresh+'&grant_type=refresh_token'
 			    }).then(function(refreshSuccess){
 				
 				// Set new tokens for auth user //
 		    		tokens.$loaded().then(function(t){
-				    console.log(refreshSuccess.data.access_token);
 				    tokens.access = refreshSuccess.data.access_token;
-				    tokens.$save().then(function(saveSuccess){
-					smallDefer.resolve('success', tokens.access);
-				    }, function(saveError){
-					smallDefer.resolve(saveError);
+				    tokens.$save();
+				    tokens.$loaded().then(function(){
+					console.log('New tokens loaded');
+					setTimeout(function(){
+					    window.location.reload(true);
+					}, 100);
 				    });
 				});
 			    }, function(refreshError){
@@ -117,7 +117,6 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 				    
 				}
 			    });
-			    return smallDefer.promise;
 			}
 			else if (requestError.status === 404) {
 			    console.error('User ID not yet defined');

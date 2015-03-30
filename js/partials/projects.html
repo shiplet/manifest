@@ -23,28 +23,54 @@
 
       <div class="panel panel-info" ng-show="showCrudFields">
 	<div class="panel-heading">
-	  <h3>ID: {{crudHeader}}</h3>
+	  <h3>Company: {{crudHeader}}</h3>
+	  <h4>Hourly Rate: {{user.hourlyRate | currency}}</h4>
 	</div>
 	<div class="panel-body">
 	  <label for="projectFilter">Filter Projects By:</label>
 	  <select id="projectFilter" class="form-control small-bottom-bump" ng-model="newEvent.project">
-	      <option value="" selected>All Projects</option>
+	      <option value="" selected>Create New Project</option>
 	      <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
-	    </select>
-	  <button class="btn btn-info small-bottom-bump" ng-click="displayLog()">Log Time</button>
-	  <button class="btn btn-info small-bottom-bump" ng-click="displayInvoice()">Create Invoice</button>
-	  <button class="btn btn-info small-bottom-bump" ng-click="changeCompany()">Change Company</button>
-	  <button class="btn btn-info small-bottom-bump" ng-click="changeHourly()">Change Hourly Rate</button>
+	  </select>
+	  <div>
+	    <button class="btn btn-info small-bottom-bump" ng-click="displayLog()">Create Project | Log Time</button>
+	    <button class="btn btn-info small-bottom-bump" ng-click="displayInvoice()">Create Invoice</button>
+	  </div>
+	  <div>
+	    <button class="btn btn-success small-bottom-bump" ng-click="displayChangeCompany()">Change Company</button>
+	    <button class="btn btn-success small-bottom-bump" ng-click="displayChangeHourly()">Change Hourly Rate</button>
+	  </div>
 	  <div ng-show="showChangeCompany">
 	    <form name="changeCompany">
-	      <input class="form-control small-bottom-bump" placeholder="New Company Name" ng-model="user.companyName">
+	      <input class="form-control small-bottom-bump" placeholder="New Company Name" ng-model="user.companyName" required autofocus>
+	      <div class="row">
+		<div class="col-md-6">
+		  <button class="btn btn-info centered small-top-bump" ng-click="updateCompany()" ng-disabled="changeCompany.$invalid">Submit</button>
+		</div>
+		<div class="col-md-6">
+		  <button class="btn btn-cancel centered small-top-bump" ng-click="displayChangeCompany()">Cancel</button>
+		</div>
+	      </div>
+	    </form>
+	  </div>
+	  <div ng-show="showChangeHourly">
+	    <form name="changeHourly">
+	      <input type="number" class="form-control small-bottom-bump" placeholder="New Hourly Rate" ng-model="user.hourlyRate" required autofocus>
+	      <div class="row">
+		<div class="col-md-6">
+		  <button class="btn btn-info centered small-top-bump" ng-click="updateHourly()" ng-disabled="changeHourly.$invalid">Submit</button>
+		</div>
+		<div class="col-md-6">
+		  <button class="btn btn-cancel centered small-top-bump" ng-click="displayChangeHourly()">Cancel</button>
+		</div>
+	      </div>
 	    </form>
 	  </div>
 	  <form name="newEventLog" ng-show="showLogFields" novalidate>	    
 	    <!-- Project Title Fields -->
 	    <div class="form-group flex">
 	      <input type="text" class="form-control small-bump" placeholder="Create New Project" ng-model="newEvent.newProject" ng-hide="newEvent.project" autofocus>	      
-	      <input type="text" class="form-control small-bump" placeholder="Subproject" ng-model="newEvent.subProject">
+	      <input type="text" class="form-control small-bump" placeholder="Subproject" ng-model="newEvent.subProject" ng-hide="newEvent.project">
 	    </div>
 	    
 	    <input type="text" class="form-control small-bottom-bump" placeholder="Description" ng-model="newEvent.description" required>
