@@ -23,8 +23,22 @@
 	</div>
       </form>
     </div>
+  </div>
+</div>
 
-    <!-- <button class="btn btn-danger login-btn small-top-bump" ng-click="unauth()">Log Out</button> 
-     </div> -->
+<div class="overlay" ng-show="showOverlay" ng-click="cancel()">
+  <div class="row">
+    <div class="logOut-popup centered">
+      <div class="col-md-3">
+	<div class="panel panel-info">
+	  <div class="panel-heading centered"><h4>You may now log in with {{newUser.email}}</h4></div>	 
+	  <div class="panel-footer">	    
+	    <div class="centered">
+	      <div class="btn btn-info popup-btn">Ok</div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
   </div>
 </div>

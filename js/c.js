@@ -3,6 +3,7 @@ var app = angular.module('manifest');
 app.controller('MainController', function($scope, envService, googleService, $location, $sessionStorage, $state, $firebaseObject){
     $scope.showCreateUserFields = true;
     $scope.showLoginFields = false;
+    $scope.showOverlay = false;
     var ref = envService.firebase.auth();
     var envData = envService.firebase.oauth();
 
@@ -46,14 +47,19 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 	console.log('Hiding create user fields');
 	$scope.showCreateUserFields = false;
 	console.log('Showing login fields');
-	$scope.showLoginFields = true;
 	ref.createUser({
 	    email: $scope.newUser.email,
 	    password: $scope.newUser.password
 	}, function(error, userData){
 	    if (error) {
 		console.log('Error creating user: ', error);
+		alert('That email address is already in use.');
+		setTimeout(function(){
+		    window.location.reload();
+		}, 100);
 	    } else {
+		$scope.showOverlay = true;
+		$scope.$apply();
 		console.log('Successful user creation: ', userData);		
 	    }
 	});
@@ -70,7 +76,16 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 		console.log('Login succeeded: ', authData.provider);
 	    }
 	});
-    };    
+    };
+
+    $scope.cancel = function() {
+	!$scope.showOverlay ? $scope.showOverlay = true : $scope.showOverlay = false;
+	!$scope.showLoginFields ? $scope.showLoginFields = true : $scope.showLoginFields = false;
+    };
+
+    $scope.ok = function() {
+	console.log('blue');
+    };
 
     $scope.showLogin = function() {
 	$scope.showCreateUserFields = $scope.showCreateUserFields ? false : true;

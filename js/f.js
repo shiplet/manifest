@@ -63,7 +63,9 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
 
     $scope.refreshEvents = function(id) {
 	id = id || $localStorage.userCalId;
+
 	googleService.authenticate.request(tokens.access, tokens.refresh, $localStorage.userCalId, userAuthData.uid).then(function(res){ 
+	    console.log('Events refreshed');
 	    loadCalScreen(res);
 	});
     };
