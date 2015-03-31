@@ -56,7 +56,7 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 			method: 'GET',
 			url: x.i+'calendars/'+calId+'/events?access_token='+access
 		    }).then(function(requestSuccess){
-			
+			console.log(requestSuccess);
 			// Parse through items and add formatting keys for
 			// $scope controller, resolve when complete
 			var y = requestSuccess.data.items;
