@@ -1,7 +1,7 @@
 <div class="container centered">
   <div class="logo">
     <img src="assets/logo_dark.svg"/>
-
+    
     <div ng-show="showCreateUserFields">
       <form name="createNewUser">
 	<input type="email" class="form-control small-top-bump small-bottom-bump" ng-model="newUser.email" placeholder="Enter Email Address" required>
@@ -22,23 +22,6 @@
 	  <a ng-click="showLogin()">Create User</a>
 	</div>
       </form>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" ng-show="showOverlay" ng-click="cancel()">
-  <div class="row">
-    <div class="logOut-popup centered">
-      <div class="col-md-3">
-	<div class="panel panel-info">
-	  <div class="panel-heading centered"><h4>You may now log in with {{newUser.email}}</h4></div>	 
-	  <div class="panel-footer">	    
-	    <div class="centered">
-	      <div class="btn btn-info popup-btn">Ok</div>
-	    </div>
-	  </div>
-	</div>
-      </div>
     </div>
   </div>
 </div>

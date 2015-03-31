@@ -1,9 +1,6 @@
 var app = angular.module('manifest');
 
 app.controller('MainController', function($scope, envService, googleService, $location, $sessionStorage, $state, $firebaseObject){
-    $scope.showCreateUserFields = true;
-    $scope.showLoginFields = false;
-    $scope.showOverlay = false;
     var ref = envService.firebase.auth();
     var envData = envService.firebase.oauth();
 
@@ -14,8 +11,8 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 		if (t) {
 		    console.log('Returned token data for: ', t.$id);
 		    if (t.access && t.refresh) {
-			console.log('Tokens already exist, routing to /manage-projects');
-			$location.path('/manage-projects');
+			console.log('Tokens already exist, routing to /basic-info');
+			$location.path('/basic-info');
 		    } else {
 			console.log('No tokens exist');
 			if (!$location.search().code && (!$sessionStorage.loggedIn || $sessionStorage.loggedIn)){
@@ -29,7 +26,7 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 			    console.log('Code received, retrieving access tokens');
 			    googleService.authenticate.token($location.search().code, authData.uid).then(function(state, res){
 				if (state) {
-				    $location.path('/manage-projects');
+				    $location.path('/basic-info');
 				}
 			    });
 			}
@@ -37,8 +34,8 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 		};
 	    });
 	} else {
-	    $scope.showCreateUserFields = true;
-	    $scope.showLoginFields = false;	    
+	    $scope.showCreateUserFields = false;
+	    $scope.showLoginFields = true;	    
 	    console.log('User is logged out');
 	}
     });
@@ -58,9 +55,16 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 		    window.location.reload();
 		}, 100);
 	    } else {
-		$scope.showOverlay = true;
-		$scope.$apply();
-		console.log('Successful user creation: ', userData);		
+		ref.authWithPassword({
+		    email: $scope.newUser.email,
+		    password: $scope.newUser.password
+		}, function(error, authData){
+		    if (error) {
+			console.log('Login failed: ', error );
+		    } else {
+			console.log('Login succeeded');
+		    }
+		});
 	    }
 	});
     };
@@ -76,15 +80,6 @@ app.controller('MainController', function($scope, envService, googleService, $lo
 		console.log('Login succeeded: ', authData.provider);
 	    }
 	});
-    };
-
-    $scope.cancel = function() {
-	!$scope.showOverlay ? $scope.showOverlay = true : $scope.showOverlay = false;
-	!$scope.showLoginFields ? $scope.showLoginFields = true : $scope.showLoginFields = false;
-    };
-
-    $scope.ok = function() {
-	console.log('blue');
     };
 
     $scope.showLogin = function() {

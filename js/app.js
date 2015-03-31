@@ -9,6 +9,11 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider){
 	    templateUrl: './js/partials/home.html',
 	    controller: 'MainController'
 	})
+	.state('basic-info', {
+	    url: '/basic-info',
+	    templateUrl: './js/partials/basic-info.html',
+	    controller: 'InfoController'
+	})
 	.state('manage-projects', {
 	    url: '/manage-projects',
 	    templateUrl: './js/partials/projects.html',

@@ -1,0 +1,23 @@
+<header class="project-header">
+  <img class="pull-right hover" ng-click="exit()" src="assets/logo_dark.svg">
+</header>
+<div class="container centered top">
+  <div class="col-md-6">
+    <div class="panel panel-success">
+      <div class="panel-heading center-text"><h3>Just need some basic info</h3></div>
+      <div class="panel-body">
+	<div class="form-group">	
+	  <form role="form" name="newCalFields">
+	    <label for="calId">Name Your Cal</label>
+	    <input id="calId" type="text" class="form-control small-bottom-bump" ng-model="user.newCalendarId" placeholder="A Unique Calendar ID" ng-init="user.newCalendarId = userId " autofocus required>
+	    <label for="companyName">Name Your Co.</label>
+	    <input id="companyName" type="text" class="form-control small-bottom-bump" ng-model="user.companyName" placeholder="Your Company or Brand Name" ng-init="user.companyName = companyName" required>
+	    <label for="hourlyRate">Name Your $Rate</label>
+	    <input id="hourlyRate" type="number" class="form-control small-bottom-bump" ng-model="user.hourlyRate" placeholder="Hourly Rate" ng-init="user.hourlyRate = hourlyRate" required>
+	    <button class="btn btn-success small-bump" ng-click="submitUserData()" ng-disabled="newCalFields.$invalid">Submit</button>
+	  </form>	
+	</div>
+      </div>
+    </div>
+  </div>  
+</div>

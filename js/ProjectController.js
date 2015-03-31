@@ -1,7 +1,7 @@
 var app = angular.module('manifest');
 
 app.controller('ProjectController', function($rootScope, $scope, envService, googleService, $location, $sessionStorage, $localStorage, $q, $interval, invoiceService) {    
-    $scope.showIdInput = true;
+    $scope.centerLogContainer = true;
     $scope.showCrudFields = false;
     $scope.showOverlay = false;
     $scope.logOutPop = false;
@@ -14,19 +14,14 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     $scope.userId = $localStorage.userCalId ? $localStorage.userCalId : null;
     $scope.companyName = $localStorage.companyName ? $localStorage.companyName : null;
     $scope.hourlyRate = $localStorage.hourlyRate ? $localStorage.hourlyRate : null;
-    $rootScope.userId = $localStorage.userCalId || null;
+    $rootScope.userId = $localStorage.userCalName || null;
+    $scope.times = envService.getTimes();
     var ref = envService.firebase.auth();
     var userAuthData = ref.getAuth(),
 	tokens = envService.firebase.tokens(userAuthData.uid),
-	eventId;
-	
-
-    var loadCalScreen = function(data) {
-	$localStorage.companyName = $scope.user.companyName;
-	$localStorage.hourlyRate = $scope.user.hourlyRate;
-	$scope.crudHeader = $scope.user.companyName;
-	$scope.showIdInput = false;
-	$scope.showCrudFields = true;	
+	eventId;	
+    
+    var loadCalScreen = function(data) {	
 	$scope.events = data;
 	$scope.parseProjects(data);
     };
@@ -34,36 +29,51 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     $rootScope.$watch('userId', function(newValue, oldValue){
 	console.log('Old value: ', oldValue);
 	console.log('New value: ', newValue);
-	$localStorage.userCalId = newValue;	
-	if (newValue) {
-	    console.log('Making ref.auth check');
-	    ref.onAuth(function(authData){
-		if (authData) {
-		    console.log('User auth successful');		    
-		    tokens.$loaded().then(function(){
-			googleService.authenticate.request(tokens.access, tokens.refresh, newValue, authData.uid).then(function(res, newToken){
-			    if (newToken) {
-				console.log(res, newToken);
-			    } else {
-				console.log('Loading calendar view');
-				console.log('Current calendar id: ', $localStorage.userCalId);
-				loadCalScreen(res);
-			    }			    
-			});		    
+	$localStorage.userCalName = newValue;
+	ref.onAuth(function(authData){
+	    tokens.$loaded().then(function(){
+		if (tokens.userCalId){
+		    googleService.authenticate.request(tokens.access, tokens.refresh, tokens.userCalId, authData.uid).then(function(res){
+			console.log('From status newValue === tokens.userCalName: ', res);
+			$scope.events = res;
+			$scope.parseProjects(res);
 		    });
-		}				
-	    });	    
-	};
+		} else {
+		    googleService.request.calendar(newValue, authData.uid, tokens.access).then(function(res){
+			console.log('Response from ProjectController: ', res);
+			if (res.status === 404) {
+			    googleService.request.newCalendar(newValue, tokens.access).then(function(res){
+				console.log(res);
+				$localStorage.userCalId = res.data.id;
+				tokens.userCalId = res.data.id;			    
+				tokens.$save();
+			    });
+			} else if (res.status === 200){
+			    googleService.authenticate.request(tokens.access, tokens.refresh, tokens.userCalId, authData.uid).then(function(res){
+				console.log('From status 200: ', res);
+				$scope.events = res;
+				$scope.parseProjects(res);
+			    });
+			} else if (res.status === 401) {
+			    googleService.authenticate.request(tokens.access, tokens.refresh, tokens.userCalId, authData.uid).then(function(res){
+				console.log('Expired token refreshed: ', res);
+			    });
+			}
+		    });    
+		};		
+	    });
+	});
     });
     
+    
     $scope.requestEvents = function(id) {
+	console.log('Requested id: ', id);
 	id = id || $scope.user.calendarId;
 	$rootScope.userId = id || $localStorage.userCalId;
     };
-
+    
     $scope.refreshEvents = function(id) {
 	id = id || $localStorage.userCalId;
-
 	googleService.authenticate.request(tokens.access, tokens.refresh, $localStorage.userCalId, userAuthData.uid).then(function(res){ 
 	    console.log('Events refreshed');
 	    loadCalScreen(res);
@@ -88,11 +98,17 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
 
     $scope.submitNewEvent = function() {
 	googleService.request.newEvent($scope.newEvent, userAuthData.uid).then(function(response){
-	    console.log($scope.newEvent);
+	     console.log('Response from Google: ', response);
 	    $scope.newEvent = {};
 	    $scope.refreshEvents();
 	});
     };
+
+    $scope.sendClient = function(project) {
+	!$scope.newEvent ? $scope.newEvent = {} : $scope.newEvent.project = project;
+	$scope.newEvent.project = project;
+    };
+    
 
     $scope.submitUpdate = function(event) {
 	googleService.request.updateEvent(event, userAuthData.uid).then(function(){
@@ -184,5 +200,10 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     $scope.updateHourly = function() {
 	$localStorage.hourlyRate = $scope.user.hourlyRate;
 	$scope.displayChangeHourly();
+    };    
+
+    $scope.displayLogs = function() {
+	$scope.centerLogContainer ? $scope.centerLogContainer = false : $scope.centerLogContainer = true;
+	!$scope.showCrudFields ? $scope.showCrudFields = true : $scope.showCrudFields = false;
     };
 });

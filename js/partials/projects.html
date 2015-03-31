@@ -1,146 +1,206 @@
 <header class="project-header">
   <img class="pull-right hover" ng-click="exit()" src="assets/logo_dark.svg">
 </header>
+<div class="container centered top" ng-show="centerLogContainer">
+  <div class="col-md-6">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+	<div><h2 class="title-text small-bottom-bump">Track Your Time</h2></div>
+	<form name="clientForm">
+	  <div class="row">
+	    <div class="col-md-6">
+	      <div class="input-group">
+		<div class="input-group-btn">
+		  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Clients <span class="caret"></span></button>
+		  <ul class="dropdown-menu" role="menu">
+		    <li ng-repeat="project in projects"><a class="hover" ng-click="sendClient(project)">{{project}}</a></li>
+		  </ul>
+		</div>
+		<input class="form-control small-bottom-bump" placeholder="Client" ng-model="newEvent.project">
+	      </div>
+	    </div>
+	    <div class="col-md-6">
+	      <div class="input-group">
+		<input class="form-control small-bottom-bump" placeholder="Project" ng-model="newEvent.subProject">
+		<div class="input-group-btn">
+		  <button type="button" class="btn btn-default dropdown-fix dropdown-toggle" data-toggle="dropdown">Projects <span class="caret"></span></button>
+		  <ul class="dropdown-menu dropdown-menu-right" role="menu">
+		    <li ng-repeat="project in projects"><a class="hover" ng-click="sentClient(project)">{{project}}</a></li>
+		  </ul>
+		</div>
+	      </div>
+	    </div>
+	    <div class="col-md-12">
+	      <textarea class="form-control small-top-bump small-bottom-bump" placeholder="Task description" ng-model="newEvent.description"></textarea>
+	    </div>
+	    <div class="col-md-6">
+	      <label for="startDay">Start Day</label>
+	      <input id="startDay" type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="newEvent.startDate">
+	      <label for="startTime">Start Time</label>
+	      <select id="startTime" class="form-control small-bottom-bump" ng-model="newEvent.startTime">
+		<option value="" selected>-Select Time-</option>
+		<option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+	      </select>
+	    </div>
+	    <div class="col-md-6">
+	      <label for="endDay">Ending Day</label>
+	      <input id="endDay" type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="newEvent.endDate">
+	      <label for="endTime">Ending Time</label>
+	      <select id="endTime" class="form-control small-bottom-bump" ng-model="newEvent.endTime">
+		<option value="" selected>-Select Time-</option>
+		<option ng-repeat="time in times" value{{time}}>{{time}}</option>
+	      </select>
+	    </div>
+	    <div class="col-md-12">
+	      <div class="col-md-4 left-text">
+		
+	      </div>
+	      <div class="col-md-4 center-text">
+		<button class="btn btn-info" ng-click="submitNewEvent()">Submit New Event</button>
+	      </div>
+	      <div class="col-md-4 right-text">
+		<button class="btn btn-info" ng-click="displayLogs()">My Logs</button>
+	      </div>
+	    </div>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>  
+
 
 <div class="container">
   <div class="row">
-    <div class="col-md-6">
-      <div class="panel panel-success" ng-show="showIdInput">
-	<div class="panel-heading">Enter Some Basic Information</div>
-	<div class="panel-body">
-	  <form role="form" name="idFields">
-	    <label for="calId">Billable Calendar</label>
-	    <input id="calId" type="email" class="form-control small-bottom-bump" ng-model="user.calendarId" placeholder="Email address tied to your billing calendar" ng-init="user.calendarId = userId " autofocus required>
-	    <label for="companyName">Company Name</label>
-	    <input id="companyName" type="text" class="form-control small-bottom-bump" ng-model="user.companyName" placeholder="Your name or company name" ng-init="user.companyName = companyName" required>
-	    <label for="hourlyRate">Hourly Rate</label>
-	    <input id="hourlyRate" type="number" class="form-control small-bottom-bump" ng-model="user.hourlyRate" placeholder="Hourly rate" ng-init="user.hourlyRate = hourlyRate" required>
-	    <button class="btn btn-success small-bump" ng-click="requestEvents()" ng-disabled="idFields.$invalid">Submit</button>
-	  </form>
-	</div>
-      </div>
-
-
-      <div class="panel panel-info" ng-show="showCrudFields">
-	<div class="panel-heading">
-	  <h3>Company: {{crudHeader}}</h3>
-	  <h4>Hourly Rate: {{user.hourlyRate | currency}}</h4>
-	</div>
-	<div class="panel-body">
-	  <label for="projectFilter">Filter Projects By:</label>
-	  <select id="projectFilter" class="form-control small-bottom-bump" ng-model="newEvent.project">
-	      <option value="" selected>Create New Project</option>
-	      <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
-	  </select>
-	  <div>
-	    <button class="btn btn-info small-bottom-bump" ng-click="displayLog()">Create Project | Log Time</button>
-	    <button class="btn btn-info small-bottom-bump" ng-click="displayInvoice()">Create Invoice</button>
-	  </div>
-	  <div>
-	    <button class="btn btn-success small-bottom-bump" ng-click="displayChangeCompany()">Change Company</button>
-	    <button class="btn btn-success small-bottom-bump" ng-click="displayChangeHourly()">Change Hourly Rate</button>
-	  </div>
-	  <div ng-show="showChangeCompany">
-	    <form name="changeCompany">
-	      <input class="form-control small-bottom-bump" placeholder="New Company Name" ng-model="user.companyName" required autofocus>
-	      <div class="row">
-		<div class="col-md-6">
-		  <button class="btn btn-info centered small-top-bump" ng-click="updateCompany()" ng-disabled="changeCompany.$invalid">Submit</button>
-		</div>
-		<div class="col-md-6">
-		  <button class="btn btn-cancel centered small-top-bump" ng-click="displayChangeCompany()">Cancel</button>
-		</div>
-	      </div>
-	    </form>
-	  </div>
-	  <div ng-show="showChangeHourly">
-	    <form name="changeHourly">
-	      <input type="number" class="form-control small-bottom-bump" placeholder="New Hourly Rate" ng-model="user.hourlyRate" required autofocus>
-	      <div class="row">
-		<div class="col-md-6">
-		  <button class="btn btn-info centered small-top-bump" ng-click="updateHourly()" ng-disabled="changeHourly.$invalid">Submit</button>
-		</div>
-		<div class="col-md-6">
-		  <button class="btn btn-cancel centered small-top-bump" ng-click="displayChangeHourly()">Cancel</button>
-		</div>
-	      </div>
-	    </form>
-	  </div>
-	  <form name="newEventLog" ng-show="showLogFields" novalidate>	    
-	    <!-- Project Title Fields -->
-	    <div class="form-group flex">
-	      <input type="text" class="form-control small-bump" placeholder="Create New Project" ng-model="newEvent.newProject" ng-hide="newEvent.project" autofocus>	      
-	      <input type="text" class="form-control small-bump" placeholder="Subproject" ng-model="newEvent.subProject" ng-hide="newEvent.project">
-	    </div>
-	    
-	    <input type="text" class="form-control small-bottom-bump" placeholder="Description" ng-model="newEvent.description" required>
-
-	    <!-- Date Time Fields -->
-	    <div class="form-group">
-	      <div class="col-md-6">
-		<div>
-		  <label for="startDate">Start</label>
-		  <input id="startDate" type="datetime-local" class="form-control" placeholder="mm/dd/yyyy" ng-model="newEvent.startDate" required>
-		</div>
-	      </div>	     
-	      
-	      <div class="col-md-6">
-		<div>
-		  <label for="endDate">End</label>
-		  <input id="endDate" type="datetime-local" class="form-control" placeholder="mm/dd/yyyy" ng-model="newEvent.endDate" required>
-		</div>
-	      </div>
-	    </div>
-	    
-	    <div class="row">
-	      <div class="col-md-6">
-		<button class="btn btn-info centered small-top-bump" ng-click="submitNewEvent()" ng-disabled="!newEvent.project && !newEvent.newProject || newEventLog.$invalid">Submit</button>
-	      </div>
-	      <div class="col-md-6">
-		<button class="btn btn-cancel centered small-top-bump" ng-click="displayLog()">Cancel</button>
-	      </div>
-	    </div>
-	    <hr>
-	  </form>
-	  <form name="makeInvoiceForm" ng-show="showInvoiceFields" novalidate>
-	    <div class="row">
-	      <div class="col-md-6">
-		<label for="invoiceProject">Invoice Project:</label>
-		<select id="invoiceProject" class="form-control small-bottom-bump" ng-model="newInvoice.project" required>
-		  <option value="" selected>All Projects</option>
-		  <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
-		</select>
-	      </div>
-	    </div>
-	    <div class="flex">
-	      <div class="button-bump">		
-		<label for="invoiceStartDate">Start Date</label>
-		<input id="invoiceStartDate" type="date" class="form-control" placeholder="mm/dd/yyyy" ng-model="newInvoice.startDate" required>
-	      </div>
-	      <div class="button-bump">
-		<label for="invoiceEndDate">End Date</label>
-		<input id="invoiceEndDate" type="date" class="form-control" placeholder="mm/dd/yyyy" ng-model="newInvoice.endDate" required>
-	      </div>
-	    </div>
-	    <div class="row">
-	      <div class="col-md-6">
-		<button class="btn btn-info centered small-top-bump" ng-click="submitNewInvoice()" ng-disabled="makeInvoiceForm.$invalid">Create New Invoice</button>
-	      </div>
-	      <div class="col-md-6">
-		<button class="btn btn-cancel centered small-top-bump" ng-click="displayInvoice()">Cancel</button>
-	      </div>
-	    </div>
-	  </form>
-	</div>
-      </div>
-    </div>
-
-   
-    <div class="col-md-6">
+    <!-- <div class="col-md-6">       -->
+    <!-- 	<div class="panel panel-info" ng-show="showCrudFields"> -->
+    <!-- 	  <div class="panel-heading"> -->
+    <!-- 	    <h3>Company: {{crudHeader}}</h3> -->
+    <!-- 	    <h4>Hourly Rate: {{user.hourlyRate | currency}}</h4> -->
+    <!-- 	</div> -->
+    <!-- 	<div class="panel-body"> -->
+    <!-- 	  <label for="projectFilter">Filter Projects By:</label> -->
+    <!-- 	  <select id="projectFilter" class="form-control small-bottom-bump" ng-model="newEvent.project"> -->
+    <!-- 	      <option value="" selected>Create New Project</option> -->
+    <!-- 	      <option ng-repeat="project in projects" value="{{project}}">{{project}}</option> -->
+    <!-- 	  </select> -->
+    <!-- 	  <div> -->
+    <!-- 	    <button class="btn btn-info small-bottom-bump" ng-click="displayLog()">Create Project | Log Time</button> -->
+    <!-- 	    <button class="btn btn-info small-bottom-bump" ng-click="displayInvoice()">Create Invoice</button> -->
+    <!-- 	  </div> -->
+    <!-- 	  <div> -->
+    <!-- 	    <button class="btn btn-success small-bottom-bump" ng-click="displayChangeCompany()">Change Company</button> -->
+    <!-- 	    <button class="btn btn-success small-bottom-bump" ng-click="displayChangeHourly()">Change Hourly Rate</button> -->
+    <!-- 	  </div> -->
+    <!-- 	  <div ng-show="showChangeCompany"> -->
+    <!-- 	    <form name="changeCompany"> -->
+    <!-- 	      <input class="form-control small-bottom-bump" placeholder="New Company Name" ng-model="user.companyName" required autofocus> -->
+    <!-- 	      <div class="row"> -->
+    <!-- 		<div class="col-md-6"> -->
+    <!-- 		  <button class="btn btn-info centered small-top-bump" ng-click="updateCompany()" ng-disabled="changeCompany.$invalid">Submit</button> -->
+    <!-- 		</div> -->
+    <!-- 		<div class="col-md-6"> -->
+    <!-- 		  <button class="btn btn-cancel centered small-top-bump" ng-click="displayChangeCompany()">Cancel</button> -->
+    <!-- 		</div> -->
+    <!-- 	      </div> -->
+    <!-- 	    </form> -->
+    <!-- 	  </div> -->
+    <!-- 	  <div ng-show="showChangeHourly"> -->
+    <!-- 	    <form name="changeHourly"> -->
+    <!-- 	      <input type="number" class="form-control small-bottom-bump" placeholder="New Hourly Rate" ng-model="user.hourlyRate" required autofocus> -->
+    <!-- 	      <div class="row"> -->
+    <!-- 		<div class="col-md-6"> -->
+    <!-- 		  <button class="btn btn-info centered small-top-bump" ng-click="updateHourly()" ng-disabled="changeHourly.$invalid">Submit</button> -->
+    <!-- 		</div> -->
+    <!-- 		<div class="col-md-6"> -->
+    <!-- 		  <button class="btn btn-cancel centered small-top-bump" ng-click="displayChangeHourly()">Cancel</button> -->
+    <!-- 		</div> -->
+    <!-- 	      </div> -->
+    <!-- 	    </form> -->
+    <!-- 	  </div> -->
+    <!-- 	  <form name="newEventLog" ng-show="showLogFields" novalidate>	     -->
+    <!-- 	    <\!-- Project Title Fields -\-> -->
+    <!-- 	    <div class="form-group flex"> -->
+    <!-- 	      <input type="text" class="form-control small-bump" placeholder="Create New Project" ng-model="newEvent.newProject" ng-hide="newEvent.project" autofocus>	       -->
+    <!-- 	      <input type="text" class="form-control small-bump" placeholder="Subproject" ng-model="newEvent.subProject" ng-hide="newEvent.project"> -->
+    <!-- 	    </div> -->
+    
+    <!-- 	    <input type="text" class="form-control small-bottom-bump" placeholder="Description" ng-model="newEvent.description" required> -->
+    
+    <!-- 	    <\!-- Date Time Fields -\-> -->
+    <!-- 	    <div class="form-group"> -->
+    <!-- 	      <div class="col-md-6"> -->
+    <!-- 		<div> -->
+    <!-- 		  <label for="startDate">Start Date</label> -->
+    <!-- 		  <input id="startDate" type="text" class="form-control" placeholder="mm/dd/yyyy" ng-model="newEvent.startDate" required> -->
+    <!-- 		  <label for="startTime">Start Time</label> -->
+    <!-- 		  <input id="startTime" type="text" class="form-control" placeholder="hh:mm AM/PM" ng-model="newEvent.startTime" required> -->
+    <!-- 		</div> -->
+    <!-- 	      </div>	      -->
+    
+    <!-- 	      <div class="col-md-6"> -->
+    <!-- 		<div> -->
+    <!-- 		  <label for="endDate">End Date</label> -->
+    <!-- 		  <input id="endDate" type="text" class="form-control" placeholder="mm/dd/yyyy" ng-model="newEvent.endDate" required> -->
+    <!-- 		  <label for="endTime">End Time</label> -->
+    <!-- 		  <input id="endTime" type="text" class="form-control" placeholder="hh:mm AM/PM" ng-model="newEvent.endTime" required> -->
+    <!-- 		</div> -->
+    <!-- 	      </div> -->
+    <!-- 	    </div> -->
+    
+    <!-- 	    <div class="row"> -->
+    <!-- 	      <div class="col-md-6"> -->
+    <!-- 		<button class="btn btn-info centered small-top-bump" ng-click="submitNewEvent()" ng-disabled="!newEvent.project && !newEvent.newProject || newEventLog.$invalid">Submit</button> -->
+    <!-- 	      </div> -->
+    <!-- 	      <div class="col-md-6"> -->
+    <!-- 		<button class="btn btn-cancel centered small-top-bump" ng-click="displayLog()">Cancel</button> -->
+    <!-- 	      </div> -->
+    <!-- 	    </div> -->
+    <!-- 	    <hr> -->
+    <!-- 	  </form> -->
+    <!-- 	  <form name="makeInvoiceForm" ng-show="showInvoiceFields" novalidate> -->
+    <!-- 	    <div class="row"> -->
+    <!-- 	      <div class="col-md-6"> -->
+    <!-- 		<label for="invoiceProject">Invoice Project:</label> -->
+    <!-- 		<select id="invoiceProject" class="form-control small-bottom-bump" ng-model="newInvoice.project" required> -->
+    <!-- 		  <option value="" selected>All Projects</option> -->
+    <!-- 		  <option ng-repeat="project in projects" value="{{project}}">{{project}}</option> -->
+    <!-- 		</select> -->
+    <!-- 	      </div> -->
+    <!-- 	    </div> -->
+    <!-- 	    <div class="flex"> -->
+    <!-- 	      <div class="button-bump">		 -->
+    <!-- 		<label for="invoiceStartDate">Start Date</label> -->
+    <!-- 		<input id="invoiceStartDate" type="date" class="form-control" placeholder="mm/dd/yyyy" ng-model="newInvoice.startDate" required> -->
+    <!-- 	      </div> -->
+    <!-- 	      <div class="button-bump"> -->
+    <!-- 		<label for="invoiceEndDate">End Date</label> -->
+    <!-- 		<input id="invoiceEndDate" type="date" class="form-control" placeholder="mm/dd/yyyy" ng-model="newInvoice.endDate" required> -->
+    <!-- 	      </div> -->
+    <!-- 	    </div> -->
+    <!-- 	    <div class="row"> -->
+    <!-- 	      <div class="col-md-6"> -->
+    <!-- 		<button class="btn btn-info centered small-top-bump" ng-click="submitNewInvoice()" ng-disabled="makeInvoiceForm.$invalid">Create New Invoice</button> -->
+    <!-- 	      </div> -->
+    <!-- 	      <div class="col-md-6"> -->
+    <!-- 		<button class="btn btn-cancel centered small-top-bump" ng-click="displayInvoice()">Cancel</button> -->
+    <!-- 	      </div> -->
+    <!-- 	    </div> -->
+    <!-- 	  </form> -->
+    <!-- 	</div> -->
+    <!--   </div> -->
+    <!-- </div> -->
+    
+    
+    <div class="col-md-12">
       <div class="panel panel-info" ng-show="showCrudFields">
 	<div class="panel-heading">
 	  <h3>Currently Logged Events</h3>
-	  <button pending class="btn btn-primary small-bottom-bump" request="refreshEvents()">Refresh Events</button>
+	  <div class="row">
+	    <div class="col-md-12">
+	      <button class="btn btn-info pull-right" ng-click="displayLogs()">Back to Tracking</button>
+	    </div>
+	  </div>
 	</div>
 	<div class="panel-body">
 	  <!-- Standard Event View -->
@@ -152,7 +212,7 @@
 	      <div class="delete right"><a title="Delete this event" class="hover" ng-click="deleteCheck(event.id)">&times;</a></div>
 	      <hr>
 	    </div>
-
+	    
 	    <!-- Update Event View -->
 	    <div ng-show="event.isUpdating">
 	      <form>

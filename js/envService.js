@@ -7,7 +7,7 @@ app.service('envService', function($window, $http, $firebaseArray, $firebaseObje
 		return new Firebase('https://manifest.firebaseio.com');
 	    },
 	    oauth: function() {
-		return $firebaseObject(new Firebase('htts://manifest.firebaseio.com/production-env'));
+		return $firebaseObject(new Firebase('htts://manifest.firebaseio.com/env'));
 	    },
 	    users: function() {
 		return $firebaseObject(new Firebase('https://manifest.firebaseio.com/users'));
@@ -15,6 +15,28 @@ app.service('envService', function($window, $http, $firebaseArray, $firebaseObje
 	    tokens: function(uid) {
 		return $firebaseObject(new Firebase('https://manifest.firebaseio.com/users/'+uid));
 	    }
+	},
+	getTimes: function() {
+	    var x = [];
+	    for (var i = 0; i < 24; i++) {
+		if (i < 12) {
+		    if (i === 0) {
+			x.push('12:00 am', '12:15 am', '12:30 am', '12:45 am');
+		    }
+		    else {
+			x.push(i + ':00 am', i + ':15 am', i + ':30 am', i + ':45 am');
+		    }
+		}
+		else {
+		    if (i === 12) {
+			x.push("12:00 pm", "12:15 pm", "12:30 pm", "12:45 pm");
+		    }
+		    else {
+			x.push((i - 12) + ":00 pm", (i - 12) + ":15 pm", (i - 12) + ":30 pm", (i - 12) + ":45 pm");
+		    }
+		}
+	    }
+	    return x;
 	},
 	getInvoice: function(invoice, events) {
 	    var project = invoice.project;

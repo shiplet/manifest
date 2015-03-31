@@ -132,7 +132,38 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 		return deferred.promise;
 	    }
 	},	        
-	request: {	    
+	request: {
+	    calendar: function(id, uid, access) {
+		var deferred = $q.defer();
+		envService.firebase.oauth().$loaded().then(function(x){
+		    $http({
+			method: 'GET',
+			url: x.i+'calendars/'+id+'?access_token='+access
+		    }).then(function(success){
+			deferred.resolve(success);
+		    }, function(error){
+			deferred.resolve(error);
+		    });
+		});
+		return deferred.promise;
+	    },
+	    newCalendar: function(id, access) {
+		var deferred = $q.defer();
+		envService.firebase.oauth().$loaded().then(function(x){
+		    $http({
+			method: 'POST',
+			url: x.i+'calendars?fields=id&access_token='+access,
+			data: {
+			    "summary": id
+			}
+		    }).then(function(success){
+			deferred.resolve(success);
+		    }, function(error){
+			deferred.resolve(error);
+		    });
+		});
+		return deferred.promise;
+	    },    
 	    newEvent: function(event, uid) {
 		var title, startDate, endDate,
 		    tokens = envService.firebase.tokens(uid);
@@ -148,17 +179,18 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 		}		
 		var deferred = $q.defer();
 		console.log('Making API call to POST data');
-		envService.firebase.oauth().$loaded().then(function(x){
+		
+		envService.firebase.oauth().$loaded().then(function(x){	    
 		    $http({
 			method: 'POST',
 			url: x.i+'calendars/'+$localStorage.userCalId+'/events?access_token='+tokens.access,
 			data: {
 			    summary: title,
 			    start: {
-				dateTime: moment(event.startDate).format()
+				dateTime: moment(event.startDate + ' ' + event.startTime).format()
 			    },
 			    end: {
-				dateTime: moment(event.endDate).format()
+				dateTime: moment(event.endDate + ' ' + event.endTime).format()
 			    }
 			}
 		    }).then(function(response) {
