@@ -3,10 +3,6 @@ html, body {
     width: 100%;
 }
 
-/* body { */
-/*     background-color: #82DBF5; */
-/* } */
-
 .login-link {
     text-align: center;    
 }
@@ -44,8 +40,13 @@ html, body {
     margin-bottom: 15px;
 }
 
+.small-side-bump {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
 .project-header {
-    height: 100px;
+    
 }
 
 .title-text {
@@ -190,10 +191,13 @@ html, body {
 }
 
 .logOut-popup {
-    display: block;
-    position: relative;
-    top: calc(75vh / 2);
-    left: calc(75vw / 2);
+ 
+    width: 25%;
+}
+
+.logOut-popup.invoice {
+ 
+    width: 40%;
 }
 
 .hover:hover {

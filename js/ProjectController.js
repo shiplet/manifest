@@ -148,6 +148,7 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     $scope.exit = function() {
 	$scope.showOverlay = true;
 	$scope.logOutPop = true;
+	$scope.showInvoiceFields = false;
     };
 
     $scope.deleteCheck = function(id) {
@@ -158,7 +159,9 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
 
     $scope.deleteEvent = function() {
 	googleService.request.deleteEvent(eventId, userAuthData.uid).then(function(response){
-	    $scope.refreshEvents();
+	    $scope.showOverlay = false;
+	    $scope.deletePop = false;
+	    $scope.refreshEvents();	    
 	});
     };
 
@@ -166,6 +169,7 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
 	$scope.showOverlay = false;
 	$scope.logOutPop = false;
 	$scope.deletePop = false;
+	$scope.showInvoiceFields = false;
     };
 
     $scope.cancelUpdate = function() {
@@ -188,11 +192,9 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
 	$scope.showChangeHourly = false;
     };
 
-    $scope.displayInvoice = function() {
+    $scope.displayCreateInvoice = function() {
+	!$scope.showOverlay ? $scope.showOverlay = true : $scope.showOverlay = false;
 	!$scope.showInvoiceFields ? $scope.showInvoiceFields = true : $scope.showInvoiceFields = false;
-	$scope.showLogFields = false;
-	$scope.showChangeCompany = false;
-	$scope.showChangeHourly = false;	
     };
 
     $scope.displayChangeCompany = function() {

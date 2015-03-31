@@ -48,7 +48,7 @@
 		  </select>
 		</div>
 		<div class="col-md-6">
-		  <select class="form-control small-bottom-bump" ng-model="newEvent.startMeridian" required>
+		  <select id="newStartMeridian" class="form-control small-bottom-bump" ng-model="newEvent.startMeridian" required>
 		    <option value="" selected>AM / PM</option>
 		    <option value="am">AM</option>
 		    <option value="pm">PM</option>
@@ -85,7 +85,7 @@
 		<button class="btn btn-info" ng-click="submitNewEvent()">Submit New Event</button>
 	      </div>
 	      <div class="col-md-4 right-text">
-		<button class="btn btn-info" ng-click="displayLogs()">My Logs</button>
+		<button class="btn btn-info" ng-click="displayLogs()">All Logs</button>
 	      </div>
 	    </div>
 	  </div>
@@ -225,6 +225,7 @@
 	  <div class="row">
 	    <div class="col-md-12">
 	      <button class="btn btn-info pull-right" ng-click="displayLogs()">Back to Tracking</button>
+	      <button class="btn btn-info small-side-bump pull-right" ng-click="displayCreateInvoice()">Create Invoice</button>
 	    </div>
 	  </div>
 	</div>
@@ -300,8 +301,7 @@
 		</div>
 		<hr>
 	      </form>
-	    </div>
-	    
+	    </div>	    
 	  </div>	
 	</div>
       </div>
@@ -309,10 +309,10 @@
   </div>
 </div>
   
-<div class="overlay" ng-show="showOverlay" ng-click="cancel()">
-  <div class="row">
-    <div class="logOut-popup centered" ng-show="logOutPop">
-      <div class="col-md-3">
+<div class="overlay centered" ng-show="showOverlay">
+
+    <div class="logOut-popup" ng-show="logOutPop">
+      <div class="col-md-12">
 	<div class="panel panel-info">
 	  <div class="panel-heading centered"><h3>Log out?</h3></div>
 	  <div class="panel-body">
@@ -327,9 +327,9 @@
 	  </div>
 	</div>
       </div>
-    </div>
+    </div>    
     <div class="logOut-popup" ng-show="deletePop">
-      <div class="col-md-3">
+      <div class="col-md-12">
 	<div class="panel panel-info">
 	  <div class="panel-heading centered"><h3>Are you sure?</h3></div>
 	  <div class="panel-footer">
@@ -344,6 +344,53 @@
 	  </div>
 	</div>
       </div>
+    </div>    
+    <div class="logOut-popup invoice" ng-show="showInvoiceFields">
+      <div class="col-md-12">
+	<div class="panel panel-info">
+	  <div class="panel-heading centered"><h3>Create an Invoice</h3></div>
+	  <div class="panel-body">
+	    <form name="makeInvoiceForm">
+	      <div class="row">
+		<div class="col-md-6">
+		  <label for="invoiceClient">Client: <span class="red">*</span></label>
+    		  <select id="invoiceClient" class="form-control small-bottom-bump" ng-model="newInvoice.client" required>
+    		    <option value="" selected>All Clients</option>
+    		    <option ng-repeat="client in clients" value="{{client}}">{{client}}</option>
+    		  </select>
+		</div>
+		<div class="col-md-6">
+		  <label for="invoiceProject">Project: <span class="red">*</span></label>
+		  <select id="invoiceProject" class="form-control small-bottom-bump" ng-model="newInvoice.project" required>
+		    <option value="" selected>All Projects</option>
+		    <option ng-repeat="project in projects" value="{{project}}">{{project}}</option>
+		  </select>
+		</div>
+	      </div>
+	      <hr>
+	      <div class="row">
+		<div class="col-md-6">
+		  <label for="invoiceStartDay">Start Day <span class="red">*</span></label>		  
+		  <input type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="newInvoice.startDate">		 		  
+		</div>
+		<div class="col-md-6">
+		  <label for="invoiceEndDay">End Day <span class="red">*</span></label>		  
+		  <input type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="newInvoice.endDate">		  		  
+		</div>
+	      </div>
+	    </form>
+	  </div>
+	  <div class="panel-footer">
+	    <div class="row">		  
+	      <div class="col-md-6">
+		<button class="btn btn-info popup-btn" ng-click="submitNewInvoice()">Create</button>
+	      </div>
+	      <div class="col-md-6">
+		<button class="btn btn-cancel popup-btn" ng-click="cancel()">Cancel</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
     </div>
-  </div>
 </div>
