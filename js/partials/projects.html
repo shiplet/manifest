@@ -224,14 +224,17 @@
 	  <h3>Currently Logged Events</h3>
 	  <div class="row">
 	    <div class="col-md-12">
-	      <button class="btn btn-info pull-right" ng-click="displayLogs()">Back to Tracking</button>
-	      <button class="btn btn-info small-side-bump pull-right" ng-click="displayCreateInvoice()">Create Invoice</button>
+	      <div class="col-md-4 pull-left">
+		<input class="form-control small-bottom-bump" ng-model="filterClients" placeholder="Search">
+	      </div>
+	      <button class="btn btn-info small-bottom-bump" ng-click="displayLogs()">Back to Tracking</button>
+	      <button class="btn btn-info small-side-bump small-bottom-bump" ng-click="displayCreateInvoice()">Create Invoice</button>
 	    </div>
 	  </div>
 	</div>
 	<div class="panel-body">
 	  <!-- Standard Event View -->
-	  <div ng-repeat="event in events | filter: newEvent.project | orderBy:['date']:true" class="event-list">
+	  <div ng-repeat="event in events | filter: filterClients | orderBy:['date']:true" class="event-list">
 	    <div ng-hide="event.isUpdating">
 	      <h3 class="hover" ng-click="updateEvent(event)">{{event.summary}}</h3>
 	      <p class="hover" ng-click="updateEvent(event)"><em>{{event.date | date:'mediumDate'}} from {{event.start.dateTime | date:'shortTime'}} to {{event.end.dateTime | date:'shortTime'}}</em></p>
@@ -309,10 +312,10 @@
   </div>
 </div>
   
-<div class="overlay centered" ng-show="showOverlay">
+<div class="overlay" ng-show="showOverlay">
 
     <div class="logOut-popup" ng-show="logOutPop">
-      <div class="col-md-12">
+      <div class="col-md-3">
 	<div class="panel panel-info">
 	  <div class="panel-heading centered"><h3>Log out?</h3></div>
 	  <div class="panel-body">

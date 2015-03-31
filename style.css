@@ -191,13 +191,19 @@ html, body {
 }
 
 .logOut-popup {
- 
-    width: 25%;
+    display: block;
+    position: absolute;
+    width: 100%;
+    top: calc(75vh / 2);
+    left: calc(75vw / 2);
 }
 
 .logOut-popup.invoice {
- 
-    width: 40%;
+    display: block;
+    position: absolute;
+    width: 100%;
+    top: calc(47vh / 2);
+    left: calc(49vw / 2);
 }
 
 .hover:hover {
@@ -335,9 +341,12 @@ html, body {
 }
 
 @media all and (max-width: 991px) {
-    .logOut-popup {
+    .logOut-popup, .logOut-popup.invoice {
 	left: 0px;
 	padding: 0px 20%;
+    }
+    .logOut-popup.invoice {
+	top: 15px;
     }
     .right-text {
 	text-align: center;
