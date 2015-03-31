@@ -138,6 +138,11 @@ html, body {
     border-left: none;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
+    z-index: 1 !important;
+}
+
+.dropdown-fix:hover {
+    z-index: 1 !important;
 }
 
 .project-header img {

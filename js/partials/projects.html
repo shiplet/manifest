@@ -9,47 +9,73 @@
 	<form name="clientForm">
 	  <div class="row">
 	    <div class="col-md-6">
+	      <label for="newClient">Client<span class="red"> *</span></label>
 	      <div class="input-group">
-		<div class="input-group-btn">
+		<div class="input-group-btn">		 
 		  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Clients <span class="caret"></span></button>
 		  <ul class="dropdown-menu" role="menu">
-		    <li ng-repeat="project in projects"><a class="hover" ng-click="sendClient(project)">{{project}}</a></li>
+		    <li ng-repeat="client in clients"><a class="hover" ng-click="sendClient(client)">{{client}}</a></li>
 		  </ul>
 		</div>
-		<input class="form-control small-bottom-bump" placeholder="Client" ng-model="newEvent.project">
+		<input id="newClient" class="form-control small-bottom-bump" placeholder="Client" ng-model="newEvent.project" required autofocus>
 	      </div>
 	    </div>
 	    <div class="col-md-6">
+	      <label for="clientProject">Project<span class="red"> *</span></label>
 	      <div class="input-group">
-		<input class="form-control small-bottom-bump" placeholder="Project" ng-model="newEvent.subProject">
+		<input id="clientProject" class="form-control small-bottom-bump" placeholder="Project" ng-model="newEvent.subProject" required>
 		<div class="input-group-btn">
 		  <button type="button" class="btn btn-default dropdown-fix dropdown-toggle" data-toggle="dropdown">Projects <span class="caret"></span></button>
 		  <ul class="dropdown-menu dropdown-menu-right" role="menu">
-		    <li ng-repeat="project in projects"><a class="hover" ng-click="sentClient(project)">{{project}}</a></li>
+		    <li ng-repeat="project in projects"><a class="hover" ng-click="sendProject(project)">{{project}}</a></li>
 		  </ul>
 		</div>
 	      </div>
 	    </div>
 	    <div class="col-md-12">
-	      <textarea class="form-control small-top-bump small-bottom-bump" placeholder="Task description" ng-model="newEvent.description"></textarea>
+	      <label for="eventDesc" class="small-top-bump">Task Description<span class="red"> *</span></label>
+	      <textarea id="eventDesc" class="form-control small-bottom-bump" placeholder="Task description" ng-model="newEvent.description"></textarea>
 	    </div>
 	    <div class="col-md-6">
-	      <label for="startDay">Start Day</label>
-	      <input id="startDay" type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="newEvent.startDate">
-	      <label for="startTime">Start Time</label>
-	      <select id="startTime" class="form-control small-bottom-bump" ng-model="newEvent.startTime">
-		<option value="" selected>-Select Time-</option>
-		<option ng-repeat="time in times" value="{{time}}">{{time}}</option>
-	      </select>
+	      <label for="startDay">Start Day<span class="red"> *</span></label>
+	      <input id="startDay" type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="newEvent.startDate" required>
+	      <label for="startTime">Start Time<span class="red"> *</span></label>
+	      <div class="row">
+		<div class="col-md-6">
+		  <select id="startTime" class="form-control small-bottom-bump" ng-model="newEvent.startTime" required>		
+		    <option value="" selected>Select Time</option>
+		    <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+		  </select>
+		</div>
+		<div class="col-md-6">
+		  <select class="form-control small-bottom-bump" ng-model="newEvent.startMeridian" required>
+		    <option value="" selected>AM / PM</option>
+		    <option value="am">AM</option>
+		    <option value="pm">PM</option>
+		  </select>
+		</div>
+	      </div>
 	    </div>
+	    
 	    <div class="col-md-6">
-	      <label for="endDay">Ending Day</label>
-	      <input id="endDay" type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="newEvent.endDate">
-	      <label for="endTime">Ending Time</label>
-	      <select id="endTime" class="form-control small-bottom-bump" ng-model="newEvent.endTime">
-		<option value="" selected>-Select Time-</option>
-		<option ng-repeat="time in times" value{{time}}>{{time}}</option>
-	      </select>
+	      <label for="endDay">Ending Day<span class="red"> *</span></label>
+	      <input id="endDay" type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="newEvent.endDate" required>
+	      <label for="endTime">Ending Time<span class="red"> *</span></label>
+	      <div class="row">
+		<div class="col-md-6">
+		  <select id="endTime" class="form-control small-bottom-bump" ng-model="newEvent.endTime" required>
+		    <option value="" selected>Select Time</option>
+		    <option ng-repeat="time in times" value{{time}}>{{time}}</option>
+		  </select>
+		</div>
+		<div class="col-md-6">
+		  <select class="form-control small-bottom-bump" ng-model="newEvent.endMeridian" required>
+		    <option value="">AM / PM</option>
+		    <option value="am">AM</option>
+		    <option value="pm">PM</option>
+		  </select>
+		</div>
+	      </div>
 	    </div>
 	    <div class="col-md-12">
 	      <div class="col-md-4 left-text">
@@ -215,24 +241,58 @@
 	    
 	    <!-- Update Event View -->
 	    <div ng-show="event.isUpdating">
-	      <form>
+	      <form name="updateForm">
 		<label for="updateTitle">{{event.summary}}</label>
 		<input name="updateTitle" type="text" class="form-control" ng-model="event.update.summary" ng-init="event.update.summary = event.summary" autofocus>
 		
 		<div class="form-group">
 		  <div class="small-top-bump col-md-6">
-		    <label for="startDate">Start - <span class="timeStamp">{{event.start.dateTime | date:'medium'}}</span></label>
-		    <input id="startDate" type="datetime-local" class="form-control" placeholder="mm/dd/yyyy" ng-model="event.update.startDate">
+		    <label for="startDay">Current Start: <span class="timeStamp">{{event.start.dateTime | date:'medium'}}</span></label>		    
+		    <input id="startDay" type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="event.update.startDay">
+		    <label for="startTime">Start Time (required if editing day)</label>
+		    <div class="row">
+		      <div class="col-md-6">
+			<select id="startTime" class="form-control small-bottom-bump" ng-model="event.update.startTime" ng-disabled="!event.update.startDay" required>		
+			  <option value="" selected>Select Time</option>
+			  <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+			</select>
+		      </div>
+		      <div class="col-md-6">
+			<select class="form-control small-bottom-bump" ng-model="event.update.startMeridian" ng-disabled="!event.update.startTime" required>
+			  <option value="" selected>AM / PM</option>
+			  <option value="am">AM</option>
+			  <option value="pm">PM</option>
+			</select>
+		      </div>
+		    </div>
 		  </div>
+
 		  
 		  <div class="small-top-bump col-md-6">
-		    <label for="endDate">End - <span class="timeStamp">{{event.end.dateTime | date:'medium'}}</span></label>
-		    <input id="endDate" type="datetime-local" class="form-control" placeholder="mm/dd/yyyy" ng-model="event.update.endDate">
+		    <label for="endDay">Current End: <span class="timeStamp">{{event.end.dateTime | date:'medium'}}</span></label>
+		    <input id="endDay" type="text" class="form-control small-bottom-bump" placeholder="mm/dd/yy" ng-model="event.update.endDay">
+		    <label for="endTime">End Time (required if editing day)</label>
+		    <div class="row">
+		      <div class="col-md-6">
+			<select id="endTime" class="form-control small-bottom-bump" ng-model="event.update.endTime" ng-disabled="!event.update.startDay" required>
+			  <option value="" selected>Select Time</option>
+			  <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+			</select>
+		      </div>
+		      <div class="col-md-6">
+			<select class="form-control small-bottom-bump" ng-model="event.update.endMeridian" ng-disabled="!event.update.endTime" required>
+			  <option value="" selected>AM / PM</option>
+			  <option value="am">AM</option>
+			  <option value="pm">PM</option>
+			</select>
+		      </div>
+		    </div>
 		  </div>
+		  <!-- form group -->
 		</div>
 		<div class="row">
 		  <div class="col-md-6">
-		    <button class="btn btn-info centered small-top-bump" ng-click="submitUpdate(event)">Save</button>
+		    <button class="btn btn-info centered small-top-bump" ng-click="submitUpdate(event)" ng-disabled="(event.update.startDay || event.update.endDay) && updateForm.$invalid">Save</button>
 		  </div>
 		  <div class="col-md-6">
 		    <button class="btn btn-cancel centered small-top-bump" ng-click="updateEvent(event)">Cancel</button>

@@ -16,11 +16,13 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     $scope.hourlyRate = $localStorage.hourlyRate ? $localStorage.hourlyRate : null;
     $rootScope.userId = $localStorage.userCalName || null;
     $scope.times = envService.getTimes();
+    $scope.newEvent = $sessionStorage.savedEvent ? $sessionStorage.savedEvent : {};
+    $sessionStorage.savedEvent = $scope.newEvent ? null : $sessionStorage.savedEvent;
     var ref = envService.firebase.auth();
     var userAuthData = ref.getAuth(),
 	tokens = envService.firebase.tokens(userAuthData.uid),
 	eventId;	
-    
+
     var loadCalScreen = function(data) {	
 	$scope.events = data;
 	$scope.parseProjects(data);
@@ -31,10 +33,12 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
 	console.log('New value: ', newValue);
 	$localStorage.userCalName = newValue;
 	ref.onAuth(function(authData){
+	    if (authData) {
 	    tokens.$loaded().then(function(){
 		if (tokens.userCalId){
 		    googleService.authenticate.request(tokens.access, tokens.refresh, tokens.userCalId, authData.uid).then(function(res){
 			console.log('From status newValue === tokens.userCalName: ', res);
+			$localStorage.userCalId = tokens.userCalId;
 			$scope.events = res;
 			$scope.parseProjects(res);
 		    });
@@ -62,7 +66,8 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
 		    });    
 		};		
 	    });
-	});
+	    }
+	});		   
     });
     
     
@@ -81,34 +86,49 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     };
 
     $scope.parseProjects = function(data) {	
+	$sessionStorage.clients = [];
 	$sessionStorage.projects = [];
 	var x = data.filter(function(y) {
-	    if (y.summary.indexOf(':') !== -1) {
+	    if (y.summary.indexOf('|||') !== -1) {
 		return y;
 	    }
 	});
 	x.map(function(z) {
-	    var a = z.summary.split(':');
-	    if ($sessionStorage.projects.indexOf(a[0]) === -1) {
-		$sessionStorage.projects.push(a[0]);
+	    var a = z.summary.split('|||').slice(0, 1).toString().replace(' ', '').split(':');	 
+	    if ($sessionStorage.clients.indexOf(a[0]) === -1) {
+	    	$sessionStorage.clients.push(a[0]);
+	    }
+	    if ($sessionStorage.projects.indexOf(a[1]) === -1) {
+	    	$sessionStorage.projects.push(a[1]);
 	    }
 	});
+	$scope.clients = $sessionStorage.clients;
 	$scope.projects = $sessionStorage.projects;
     };
 
     $scope.submitNewEvent = function() {
 	googleService.request.newEvent($scope.newEvent, userAuthData.uid).then(function(response){
-	     console.log('Response from Google: ', response);
+	    console.log('Response from Google: ', response);
+	    if (response.status === 401) {
+		$sessionStorage.savedEvent = $scope.newEvent;
+		googleService.authenticate.request(tokens.access, tokens.refresh, tokens.userCalId, userAuthData.uid).then(function(res){
+		    console.log('Expired token refreshed: ', res);
+		});
+	    }
 	    $scope.newEvent = {};
 	    $scope.refreshEvents();
 	});
     };
 
-    $scope.sendClient = function(project) {
-	!$scope.newEvent ? $scope.newEvent = {} : $scope.newEvent.project = project;
-	$scope.newEvent.project = project;
+    $scope.sendClient = function(client) {
+	!$scope.newEvent ? $scope.newEvent = {} : $scope.newEvent.project = client;
+	$scope.newEvent.project = client;
     };
-    
+
+    $scope.sendProject = function(project) {
+	!$scope.newEvent ? $scope.newEvent = {} : $scope.newEvent.subProject = project;
+	$scope.newEvent.subProject = project;
+    };    
 
     $scope.submitUpdate = function(event) {
 	googleService.request.updateEvent(event, userAuthData.uid).then(function(){
@@ -154,7 +174,6 @@ app.controller('ProjectController', function($rootScope, $scope, envService, goo
     };
 
     $scope.logOut = function() {	
-	delete $localStorage.userCalId;
 	delete $sessionStorage.authToken;
 	delete $sessionStorage.loggedIn;
 	delete $sessionStorage.projects;

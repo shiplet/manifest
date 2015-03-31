@@ -167,42 +167,39 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 	    newEvent: function(event, uid) {
 		var title, startDate, endDate,
 		    tokens = envService.firebase.tokens(uid);
-		console.log('Parsing event characteristics');
-		if (!event.newProject && !event.subProject) {
-		    title = event.project.toUpperCase()+': '+event.description;
-		} else if (!event.newProject && event.subProject) {
-		    title = event.project.toUpperCase()+event.subProject+': '+event.description;
-		} else if (event.newProject && !event.subProject) {
-		    title = event.newProject.toUpperCase()+': '+event.description;
-		} else if (event.newProject && event.subProject) {
-		    title = event.newProject.toUpperCase()+event.subProject+': '+event.description;
-		}		
-		var deferred = $q.defer();
-		console.log('Making API call to POST data');
-		
-		envService.firebase.oauth().$loaded().then(function(x){	    
-		    $http({
-			method: 'POST',
-			url: x.i+'calendars/'+$localStorage.userCalId+'/events?access_token='+tokens.access,
-			data: {
-			    summary: title,
-			    start: {
-				dateTime: moment(event.startDate + ' ' + event.startTime).format()
-			    },
-			    end: {
-				dateTime: moment(event.endDate + ' ' + event.endTime).format()
-			    }
-			}
-		    }).then(function(response) {
-			deferred.resolve(response);
-		    }, function(error) {
-			deferred.reject(error);
+		if (!event.project || !event.subProject || !event.description || !event.startDate || !event.startTime || !event.startMeridian || !event.endDate || !event.endTime || !event.endMeridian) {
+		    alert('Please fill out all required fields');
+		    throw new Error('One or more required fields missing');
+		} else {
+		    title = event.subProject ? event.project.toUpperCase()+':'+event.subProject.toLowerCase().replace(' ', '-')+' ||| '+event.description : event.project.toUpperCase()+' ||| '+event.description;
+		    console.log(title);
+		    var deferred = $q.defer();
+		    console.log('Making API call to POST data');
+		    
+		    envService.firebase.oauth().$loaded().then(function(x){	    
+		        $http({
+		    	method: 'POST',
+		    	url: x.i+'calendars/'+$localStorage.userCalId+'/events?access_token='+tokens.access,
+		    	data: {
+		    	    summary: title,
+		    	    start: {
+		    		dateTime: moment(event.startDate+' '+event.startTime+' '+event.startMeridian).format()
+		    	    },
+		    	    end: {
+		    		dateTime: moment(event.endDate+' '+event.endTime+' '+event.endMeridian).format()
+		    	    }
+		    	}
+		        }).then(function(response) {
+		    	    deferred.resolve(response);
+		        }, function(error) {
+		    	    deferred.resolve(error);
+		        });
 		    });
-		});		
+		}		
 		return deferred.promise;
 	    },
 	    updateEvent: function(event, uid) {
-		console.log('Updating event');
+		console.log('Event to be updated: ', event);
 		var deferred = $q.defer();
 		var tokens = envService.firebase.tokens(uid);
 		console.log('Making API call');
@@ -213,10 +210,10 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 			data: {
 			    summary: event.update.summary ? event.update.summary : event.summary,
 			    start: {
-				dateTime: event.update.startDate ? moment(event.update.startDate).format() : moment(event.start.dateTime).format()
+				dateTime: event.update.startDay ? moment(event.update.startDay+' '+event.update.startTime+' '+event.update.startMeridian).format() : moment(event.start.dateTime).format()
 			    },
 			    end: {
-				dateTime: event.update.endDate ? moment(event.update.endDate).format() : moment(event.end.dateTime).format()
+				dateTime: event.update.endDay ? moment(event.update.endDay+' '+event.update.endTime+' '+event.update.endMeridian).format() : moment(event.end.dateTime).format()
 			    }
 			}
 		    }).then(function(response){
