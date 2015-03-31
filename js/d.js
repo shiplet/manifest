@@ -59,12 +59,12 @@ app.service('googleService', function(envService, $timeout, $location, $http, $q
 			console.log(requestSuccess);
 			// Parse through items and add formatting keys for
 			// $scope controller, resolve when complete
-			var y = requestSuccess.data.items;
-		    	var x = y.filter(function(z){
-		    	    if (z.status !== 'cancelled') {
-		    		return z;
-		    	    }
-		    	});
+			var x = requestSuccess.data.items;
+		    	// var x = y.filter(function(z){
+		    	//     if (z.status !== 'cancelled') {
+		    	// 	return z;
+		    	//     }
+		    	// });
 		    	x.map(function(y){
 		    	    if (y.status !== 'cancelled'){
 		    		if (y.start.hasOwnProperty('date')){
