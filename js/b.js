@@ -7,7 +7,7 @@ app.service('envService', function($window, $http, $firebaseArray, $firebaseObje
 		return new Firebase('https://manifest.firebaseio.com');
 	    },
 	    oauth: function() {
-		return $firebaseObject(new Firebase('htts://manifest.firebaseio.com/env'));
+		return $firebaseObject(new Firebase('htts://manifest.firebaseio.com/production-env'));
 	    },
 	    users: function() {
 		return $firebaseObject(new Firebase('https://manifest.firebaseio.com/users'));
